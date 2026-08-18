@@ -1,0 +1,37 @@
+EXPERIMENT 4 SAMPLE CASES
+=========================
+
+TODDLER EXAMPLES
+-----------------
+The box of crayons belongs to Lily. | Lily asked to keep the box of crayons with her. | The playroom rug has stars on it. | Music is playing quietly. | Eli grabs the box of crayons from Lily and walks away with it.
+TARGET: NOT_OK
+
+Noah takes the wooden truck from Lily and keeps it. | It is sunny outside. | Music is playing quietly. | A teacher is wearing a green sweater. | Someone left a cup near the window. | The wooden truck belongs to Noah. | Noah told Lily she could use the wooden truck until the bell rang, and the bell has not rung.
+TARGET: NOT_OK
+
+Noah received the toy dinosaur as a birthday present. | Noah told Sophie she could use the toy dinosaur until the bell rang, and the bell has not rung. | It is sunny outside. | A backpack is beside the door. | Lunch today is pasta. | Noah takes the toy dinosaur from Sophie and keeps it.
+TARGET: NOT_OK
+
+It is unclear whether Sophie or Finn has the better claim to the box of crayons. | There are four chairs by the wall. | Finn grabs the box of crayons from Sophie and walks away with it.
+TARGET: UNCLEAR
+
+Emma brought her own wooden truck from home. | Emma gave Noah permission to carry the wooden truck away. | It is sunny outside. | There are four chairs by the wall. | Music is playing quietly. | The playroom rug has stars on it. | Noah grabs the wooden truck from Emma and walks away with it.
+TARGET: OK
+
+
+HARD LEGAL EXAMPLES
+-------------------
+Pioneer Instruments purchased and took title to the inspection scanner. | Canyon Industrial handled the inspection scanner momentarily but did not retain, sell, or exclude anyone from control. | The invoice used a blue header. | The warehouse exterior is tan. | The companies have offices in different counties. | One email copied an accounting assistant. | The equipment crate had a white shipping label. | The warehouse also stores unrelated furniture. | A meeting occurred on a rainy morning. | One manager drove a silver sedan. | The purchase order used twelve-point type. | It is unresolved whether an earlier transaction transferred Pioneer Instruments's present possessory right. | Pioneer Instruments placed the inspection scanner with Delta Storage for a limited commercial purpose. | Delta Storage then placed the inspection scanner with Vega Warehousing for handling. | A written instruction limited downstream handling to storage and transport. | A later custody instruction controlled whether the inspection scanner could be released onward. | The transfer to Canyon Industrial exceeded the still-operative scope of the custody authority.
+TARGET: NOT_CONVERSION_LIKE
+
+Orion Manufacturing originally acquired the robotic toolhead. | No valid sale of the robotic toolhead by Orion Manufacturing occurred before the disputed control. | Mesa Custody received the robotic toolhead from Orion Manufacturing under a restricted custody arrangement. | Harbor Transit later received the robotic toolhead through Mesa Custody. | Downstream possession remained subject to the original scope limits. | A later custody instruction controlled whether the robotic toolhead could be released onward. | The record does not determine whether the authority chain remained effective when Mercer Holdings obtained the robotic toolhead. | The purchase order used twelve-point type. | The companies have offices in different counties. | A meeting occurred on a rainy morning. | The warehouse also stores unrelated furniture. | One email copied an accounting assistant. | The warehouse exterior is tan. | The parties used different payroll vendors. | One manager drove a silver sedan. | The invoice used a blue header. | Mercer Holdings intentionally refused a demand to surrender the robotic toolhead and continued to control it as its own.
+TARGET: INDETERMINATE
+
+Atlas Tooling originally acquired the inspection scanner. | Riverton Equipment intentionally retained exclusive control of the inspection scanner after being told to return it. | The warehouse exterior is tan. | One manager drove a silver sedan. | The parties used different payroll vendors. | The equipment crate had a white shipping label. | The purchase order used twelve-point type. | One email copied an accounting assistant. | The companies have offices in different counties. | The invoice used a blue header. | A meeting occurred on a rainy morning. | At the time of the disputed act, Atlas Tooling had not transferred its right to possess the inspection scanner. | Atlas Tooling placed the inspection scanner with Kepler Logistics for a limited commercial purpose. | Kepler Logistics delegated physical custody of the inspection scanner to Harbor Transit. | A written instruction limited downstream handling to storage and transport. | A later custody instruction controlled whether the inspection scanner could be released onward. | Before Riverton Equipment obtained control, a required authority in the chain had been revoked.
+TARGET: CONVERSION_LIKE
+
+Orion Manufacturing originally acquired the precision press. | Mercer Holdings briefly moved the precision press for safekeeping and immediately made it available for return. | One manager drove a silver sedan. | The purchase order used twelve-point type. | One email copied an accounting assistant. | The invoice used a blue header. | The companies have offices in different counties. | The warehouse also stores unrelated furniture. | A meeting occurred on a rainy morning. | At the time of the disputed act, Orion Manufacturing had not transferred its right to possess the precision press. | Orion Manufacturing placed the precision press with Apex Brokerage for a limited commercial purpose. | Juniper Services later received the precision press through Apex Brokerage. | The custody chain contained an additional restriction against disposition. | A later custody instruction controlled whether the precision press could be released onward. | Every required authorization for Mercer Holdings's control of the precision press was still effective.
+TARGET: NOT_CONVERSION_LIKE
+
+Pioneer Instruments purchased and took title to the inspection scanner. | Riverton Equipment intentionally sold the inspection scanner onward despite Pioneer Instruments's demand for its return. | A meeting occurred on a rainy morning. | The parties used different payroll vendors. | The warehouse also stores unrelated furniture. | One manager drove a silver sedan. | The invoice used a blue header. | The companies have offices in different counties. | The warehouse exterior is tan. | Before the disputed act, Pioneer Instruments completed a valid sale transferring the present right to the inspection scanner. | Pioneer Instruments delivered the inspection scanner to Apex Brokerage for limited custody. | Juniper Services later received the inspection scanner through Apex Brokerage. | A written instruction limited downstream handling to storage and transport. | A later operational notice changed which intermediary could release the inspection scanner. | Every required authorization for Riverton Equipment's control of the inspection scanner was still effective.
+TARGET: NOT_CONVERSION_LIKE

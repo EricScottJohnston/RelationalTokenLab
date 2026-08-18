@@ -1,0 +1,205 @@
+{
+  "experiment": "Experiment 4 \u2014 Cross-Domain Coherence Transfer",
+  "seed": 41,
+  "locked_before_run": true,
+  "core_hypothesis": "A relational state-update principle learned from simple toddler moral provenance can provide measurable few-shot leverage in a semantically and institutionally different conversion-style legal domain when the operator is frozen and only the new domain encoder/head may adapt.",
+  "domains": {
+    "A": "Toddler toy-taking / taking-back / permission / provenance",
+    "B": "Synthetic Arizona-style conversion cases with custody chains, authority, immediate possessory right, and serious interference"
+  },
+  "anti_cheating_design": [
+    "Separate domain vocabularies and fresh legal encoder/head.",
+    "Only relational operator and initial state geometry transfer.",
+    "Transferred operator frozen during legal training.",
+    "Legal training chain depth 1-2; hard test depth 4.",
+    "Scratch relational control gets identical legal labels.",
+    "Scrambled-operator control keeps weight scale but destroys learned recurrence.",
+    "Tiny transformer gets identical legal labels.",
+    "Material flips, irrelevant perturbations, and delayed revelation scored separately."
+  ],
+  "legal_ground_truth_scope": "Narrow controlled conversion-style core, not a legal expert system: immediate right to possession, intentional dominion/control, serious interference, and operative authorization.",
+  "training": {
+    "toddler_steps": 900,
+    "legal_steps_per_model_per_budget": 325,
+    "batch_size": 64,
+    "legal_budgets": [
+      16,
+      32,
+      64,
+      128,
+      256
+    ],
+    "toddler_train_examples": 5000,
+    "toddler_eval_examples": 1200,
+    "hard_legal_test_examples": 1200
+  },
+  "toddler_heldout_accuracy": 1.0,
+  "sample_efficiency": [
+    {
+      "legal_examples": 16,
+      "transfer_accuracy": 0.5358333333333334,
+      "scratch_accuracy": 0.47,
+      "scrambled_accuracy": 0.495,
+      "transformer_accuracy": 0.5241666666666667
+    },
+    {
+      "legal_examples": 32,
+      "transfer_accuracy": 0.475,
+      "scratch_accuracy": 0.4583333333333333,
+      "scrambled_accuracy": 0.49,
+      "transformer_accuracy": 0.38333333333333336
+    },
+    {
+      "legal_examples": 64,
+      "transfer_accuracy": 0.505,
+      "scratch_accuracy": 0.455,
+      "scrambled_accuracy": 0.5491666666666667,
+      "transformer_accuracy": 0.4766666666666667
+    },
+    {
+      "legal_examples": 128,
+      "transfer_accuracy": 0.4275,
+      "scratch_accuracy": 0.43583333333333335,
+      "scrambled_accuracy": 0.5133333333333333,
+      "transformer_accuracy": 0.6758333333333333
+    },
+    {
+      "legal_examples": 256,
+      "transfer_accuracy": 0.7575,
+      "scratch_accuracy": 0.7591666666666667,
+      "scrambled_accuracy": 0.875,
+      "transformer_accuracy": 0.6733333333333333
+    }
+  ],
+  "special_tests_at_max_budget": {
+    "transfer": {
+      "material_flip_correct": 0.36666666666666664,
+      "irrelevant_invariance": 0.775,
+      "revelation_revision_correct": 0.05
+    },
+    "scratch": {
+      "material_flip_correct": 0.6916666666666667,
+      "irrelevant_invariance": 0.7416666666666667,
+      "revelation_revision_correct": 0.075
+    },
+    "scrambled": {
+      "material_flip_correct": 0.9291666666666667,
+      "irrelevant_invariance": 0.925,
+      "revelation_revision_correct": 0.23333333333333334
+    },
+    "transformer": {
+      "material_flip_correct": 0.3416666666666667,
+      "irrelevant_invariance": 0.5833333333333334,
+      "revelation_revision_correct": 0.025
+    }
+  },
+  "locked_success_criteria": {
+    "at_64_examples_transfer_minus_scratch": ">= 0.15",
+    "at_64_examples_transfer_minus_scrambled": ">= 0.15",
+    "at_64_examples_transfer_minus_transformer": ">= 0.10",
+    "at_128_examples_transfer_hard_legal_accuracy": ">= 0.85",
+    "material_one_fact_flip_at_256": ">= 0.85",
+    "irrelevant_surface_invariance_at_256": ">= 0.90",
+    "delayed_revelation_revision_at_256": ">= 0.80"
+  },
+  "criterion_results": {
+    "few_shot_advantage_vs_scratch_at_64": false,
+    "few_shot_advantage_vs_scrambled_at_64": false,
+    "few_shot_advantage_vs_transformer_at_64": false,
+    "absolute_hard_legal_accuracy_at_128": false,
+    "material_flip_at_256": false,
+    "irrelevant_invariance_at_256": false,
+    "delayed_revelation_revision_at_256": false
+  },
+  "locked_all_criteria_pass": false,
+  "parameter_counts_at_max_budget": {
+    "transfer_total": 26923,
+    "transfer_trainable_legal_adapter": 14563,
+    "scratch_total_and_trainable": 26923,
+    "scrambled_total": 26923,
+    "transformer_total": 50451
+  },
+  "hard_test_confusion_matrices_rows_truth_cols_prediction": {
+    "transfer": [
+      [
+        91,
+        182,
+        5
+      ],
+      [
+        0,
+        657,
+        24
+      ],
+      [
+        1,
+        79,
+        161
+      ]
+    ],
+    "scratch": [
+      [
+        216,
+        2,
+        60
+      ],
+      [
+        56,
+        563,
+        62
+      ],
+      [
+        64,
+        45,
+        132
+      ]
+    ],
+    "scrambled": [
+      [
+        223,
+        53,
+        2
+      ],
+      [
+        7,
+        671,
+        3
+      ],
+      [
+        51,
+        34,
+        156
+      ]
+    ],
+    "transformer": [
+      [
+        95,
+        89,
+        94
+      ],
+      [
+        26,
+        493,
+        162
+      ],
+      [
+        1,
+        20,
+        220
+      ]
+    ]
+  },
+  "labels": {
+    "toddler": [
+      "NOT_OK",
+      "OK",
+      "UNCLEAR"
+    ],
+    "legal": [
+      "CONVERSION_LIKE",
+      "NOT_CONVERSION_LIKE",
+      "INDETERMINATE"
+    ]
+  },
+  "interpretation_rule": "Primary result is cross-domain sample-efficiency advantage, not merely final accuracy. Positive transfer requires intact toddler-pretrained frozen operator to beat scratch and scrambled controls while reacting to material provenance and ignoring irrelevant surface variation. Mixed results remain mixed."
+}

@@ -1,0 +1,158 @@
+{
+  "experiment": "Language-to-geometry compositional generalization",
+  "seed": 11,
+  "train_max_len": 5,
+  "test_max_len": 32,
+  "steps": 900,
+  "batch_size": 128,
+  "examples_per_length": 400,
+  "relation_phrases": {
+    "0": [
+      "aligned with",
+      "in the same orientation as",
+      "pointing the same way as",
+      "unrotated from"
+    ],
+    "1": [
+      "rotated ninety degrees clockwise from",
+      "a quarter turn clockwise from",
+      "turned right ninety degrees from",
+      "one clockwise quarter turn from"
+    ],
+    "2": [
+      "opposite to",
+      "rotated one hundred eighty degrees from",
+      "a half turn from",
+      "facing the reverse direction from"
+    ],
+    "3": [
+      "rotated ninety degrees counterclockwise from",
+      "a quarter turn counterclockwise from",
+      "turned left ninety degrees from",
+      "one counterclockwise quarter turn from"
+    ]
+  },
+  "phrase_phase_table": [
+    {
+      "phrase": "aligned with",
+      "true_relation": 0,
+      "predicted_relation": 0,
+      "angle_radians": 0.0003638717462308705
+    },
+    {
+      "phrase": "in the same orientation as",
+      "true_relation": 0,
+      "predicted_relation": 0,
+      "angle_radians": 0.0018089159857481718
+    },
+    {
+      "phrase": "pointing the same way as",
+      "true_relation": 0,
+      "predicted_relation": 0,
+      "angle_radians": 0.0001365185307804495
+    },
+    {
+      "phrase": "unrotated from",
+      "true_relation": 0,
+      "predicted_relation": 0,
+      "angle_radians": 0.00153747433796525
+    },
+    {
+      "phrase": "rotated ninety degrees clockwise from",
+      "true_relation": 1,
+      "predicted_relation": 1,
+      "angle_radians": 1.600393295288086
+    },
+    {
+      "phrase": "a quarter turn clockwise from",
+      "true_relation": 1,
+      "predicted_relation": 1,
+      "angle_radians": 1.571873664855957
+    },
+    {
+      "phrase": "turned right ninety degrees from",
+      "true_relation": 1,
+      "predicted_relation": 1,
+      "angle_radians": 1.5685969591140747
+    },
+    {
+      "phrase": "one clockwise quarter turn from",
+      "true_relation": 1,
+      "predicted_relation": 1,
+      "angle_radians": 1.5413612127304077
+    },
+    {
+      "phrase": "opposite to",
+      "true_relation": 2,
+      "predicted_relation": 2,
+      "angle_radians": -3.140033483505249
+    },
+    {
+      "phrase": "rotated one hundred eighty degrees from",
+      "true_relation": 2,
+      "predicted_relation": 2,
+      "angle_radians": 3.138310670852661
+    },
+    {
+      "phrase": "a half turn from",
+      "true_relation": 2,
+      "predicted_relation": 2,
+      "angle_radians": -3.140577554702759
+    },
+    {
+      "phrase": "facing the reverse direction from",
+      "true_relation": 2,
+      "predicted_relation": 2,
+      "angle_radians": 3.1392769813537598
+    },
+    {
+      "phrase": "rotated ninety degrees counterclockwise from",
+      "true_relation": 3,
+      "predicted_relation": 3,
+      "angle_radians": -1.536920428276062
+    },
+    {
+      "phrase": "a quarter turn counterclockwise from",
+      "true_relation": 3,
+      "predicted_relation": 3,
+      "angle_radians": -1.571521520614624
+    },
+    {
+      "phrase": "turned left ninety degrees from",
+      "true_relation": 3,
+      "predicted_relation": 3,
+      "angle_radians": -1.5732783079147339
+    },
+    {
+      "phrase": "one counterclockwise quarter turn from",
+      "true_relation": 3,
+      "predicted_relation": 3,
+      "angle_radians": -1.6025527715682983
+    }
+  ],
+  "generalization_summary": {
+    "phase": {
+      "mean_in_distribution": 1.0,
+      "mean_out_of_distribution": 1.0,
+      "last_length_accuracy": 1.0
+    },
+    "transformer": {
+      "mean_in_distribution": 0.9945000052452088,
+      "mean_out_of_distribution": 0.269259258000939,
+      "last_length_accuracy": 0.27250000834465027
+    }
+  },
+  "contradiction_summary": {
+    "phase": {
+      "mean_in_distribution": 1.0,
+      "mean_out_of_distribution": 1.0,
+      "last_length_accuracy": 1.0
+    },
+    "transformer": {
+      "mean_in_distribution": 0.9916666746139526,
+      "mean_out_of_distribution": 0.5176851826685446,
+      "last_length_accuracy": 0.5224999785423279
+    }
+  },
+  "interpretation_warning": "This remains a controlled synthetic language experiment. The relation vocabulary is small and the relational model is given complex multiplication as its composition rule. The experiment tests whether it can learn language-to-relation mappings from end-to-end labels and preserve systematic composition beyond the training depth. It does not establish performance on unrestricted natural language."
+}

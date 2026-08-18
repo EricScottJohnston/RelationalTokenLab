@@ -1,0 +1,23 @@
+EXPERIMENT 1 — SAMPLE LANGUAGE CHAINS
+
+Latent relation algebra:
+  aligned = 0
+  clockwise quarter-turn = +1
+  opposite = +2
+  counterclockwise quarter-turn = +3
+(all modulo 4)
+
+The neural models do not receive the numeric relation for an input phrase.
+They receive the words.
+
+Example:
+  B is a quarter turn clockwise from A.
+  C is opposite to B.
+  D is turned left ninety degrees from C.
+
+The target asks for D relative to A.
+
+The language→phase model learns a unit complex relation for each phrase,
+then composes those learned relations structurally by complex multiplication.
+
+The transformer receives the same phrase words but no explicit composition rule.

@@ -1,0 +1,177 @@
+{
+  "experiment": "Experiment 1b \u2014 Language-Internal Relational Structure",
+  "seed": 61,
+  "locked_before_run": true,
+  "composition": "additive",
+  "n_angles": 12,
+  "state_cleanup": false,
+  "num_relation_states": null,
+  "core_question": "Is the compositional structure a property of the language system rather than of the referents, and does it survive a change of language?",
+  "non_referential_guarantee": "Ground truth is form-to-form only. The relation between teach and teacher is the same object as the relation between write and writer; nothing in the loss requires knowing what either word denotes. Input is characters, never a word list.",
+  "composed_relation_space": {
+    "definition": "category transition over {NOUN, VERB, ADJ, ADV} crossed with Z2 polarity",
+    "size": 6
+  },
+  "train_depths": [
+    1,
+    2
+  ],
+  "test_depths": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "german_budgets": [
+    8,
+    16,
+    32,
+    64,
+    128
+  ],
+  "zero_shot": [
+    {
+      "depth": 1,
+      "english_real_relational": 1.0,
+      "english_real_transformer": 1.0,
+      "nonce_relational": 0.74,
+      "nonce_transformer": 0.4633333333333333,
+      "german_relational": 0.5933333333333334,
+      "german_transformer": 0.495,
+      "nonce_majority": 0.3233333333333333,
+      "german_majority": 0.41333333333333333
+    },
+    {
+      "depth": 2,
+      "english_real_relational": 1.0,
+      "english_real_transformer": 1.0,
+      "nonce_relational": 0.4766666666666667,
+      "nonce_transformer": 0.34833333333333333,
+      "german_relational": 0.2916666666666667,
+      "german_transformer": 0.36666666666666664,
+      "nonce_majority": 0.10833333333333334,
+      "german_majority": 0.46166666666666667
+    },
+    {
+      "depth": 3,
+      "english_real_relational": 1.0,
+      "english_real_transformer": 0.715,
+      "nonce_relational": 0.325,
+      "nonce_transformer": 0.23833333333333334,
+      "german_relational": 0.3416666666666667,
+      "german_transformer": 0.16333333333333333,
+      "nonce_majority": 0.285,
+      "german_majority": 0.37
+    },
+    {
+      "depth": 4,
+      "english_real_relational": 0.65,
+      "english_real_transformer": 0.14666666666666667,
+      "nonce_relational": 0.31,
+      "nonce_transformer": 0.265,
+      "german_relational": 0.0,
+      "german_transformer": 0.0,
+      "nonce_majority": 0.14166666666666666,
+      "german_majority": 0.0
+    }
+  ],
+  "depth_generalization": [
+    {
+      "depth": 1,
+      "relational": 1.0,
+      "transformer": 1.0,
+      "majority": 0.46,
+      "unseen_combos": 0.0,
+      "n": 600
+    },
+    {
+      "depth": 2,
+      "relational": 1.0,
+      "transformer": 1.0,
+      "majority": 0.57,
+      "unseen_combos": 0.0,
+      "n": 600
+    },
+    {
+      "depth": 3,
+      "relational": 1.0,
+      "transformer": 0.715,
+      "majority": 0.023333333333333334,
+      "unseen_combos": 0.07166666666666667,
+      "n": 600
+    },
+    {
+      "depth": 4,
+      "relational": 0.65,
+      "transformer": 0.14666666666666667,
+      "majority": 0.0,
+      "unseen_combos": 0.285,
+      "n": 600
+    }
+  ],
+  "crosslingual_transfer": [
+    {
+      "examples": 8,
+      "transfer": 0.37833333333333335,
+      "scratch": 0.29375,
+      "scrambled": 0.42333333333333334,
+      "transformer": 0.2775,
+      "majority": 0.31125
+    },
+    {
+      "examples": 16,
+      "transfer": 0.57375,
+      "scratch": 0.39791666666666664,
+      "scrambled": 0.3958333333333333,
+      "transformer": 0.2975,
+      "majority": 0.31125
+    },
+    {
+      "examples": 32,
+      "transfer": 0.7175,
+      "scratch": 0.6025,
+      "scrambled": 0.55875,
+      "transformer": 0.39916666666666667,
+      "majority": 0.31125
+    },
+    {
+      "examples": 64,
+      "transfer": 0.8475,
+      "scratch": 0.7704166666666666,
+      "scrambled": 0.67,
+      "transformer": 0.5145833333333333,
+      "majority": 0.31125
+    },
+    {
+      "examples": 128,
+      "transfer": 0.84125,
+      "scratch": 0.9133333333333333,
+      "scrambled": 0.63,
+      "transformer": 0.6645833333333333,
+      "majority": 0.31125
+    }
+  ],
+  "parameter_counts": {
+    "relational_total": 33417,
+    "transformer_total": 102597,
+    "transfer_trainable_reader_only": 13600
+  },
+  "locked_success_criteria": {
+    "depth4_relational_above_85": ">= 0.85",
+    "depth4_relational_beats_transformer_by_20": ">= 0.20",
+    "depth4_relational_beats_majority_by_25": ">= 0.25",
+    "german32_transfer_beats_scratch_by_15": ">= 0.15",
+    "german32_transfer_beats_scrambled_by_15": ">= 0.15",
+    "german32_transfer_beats_transformer_by_10": ">= 0.10"
+  },
+  "criterion_results": {
+    "depth4_relational_above_85": false,
+    "depth4_relational_beats_transformer_by_20": true,
+    "depth4_relational_beats_majority_by_25": true,
+    "german32_transfer_beats_scratch_by_15": false,
+    "german32_transfer_beats_scrambled_by_15": true,
+    "german32_transfer_beats_transformer_by_10": true
+  },
+  "all_locked_criteria_met": false,
+  "interpretation_rule": "A pass on depth generalization shows the relation states compose beyond training depth on language-internal structure. A pass on cross-linguistic transfer shows the same states are recoverable from a different language with different surface marking. Neither establishes that arbitrary natural text has this structure - the lexicon here is hand-built and the operation set is small. Mixed results stay mixed."
+}

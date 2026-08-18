@@ -1,0 +1,22 @@
+STRUCTURED LEARNED OPERATOR
+===========================
+      b=0  b=1  b=2  b=3
+a=0   0    1    2    3
+a=1   1    2    3    0
+a=2   2    3    0    1
+a=3   3    0    1    2
+
+HIDDEN GROUND-TRUTH TABLE (used only by generator/evaluator)
+      b=0  b=1  b=2  b=3
+a=0   0    1    2    3
+a=1   1    2    3    0
+a=2   2    3    0    1
+a=3   3    0    1    2
+
+UNCONSTRAINED LEARNED OPERATOR
+==============================
+      b=0  b=1  b=2  b=3
+a=0   0    1    2    3
+a=1   1    2    3    0
+a=2   2    3    0    1
+a=3   3    0    1    2

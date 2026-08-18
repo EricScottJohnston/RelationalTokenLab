@@ -1,0 +1,160 @@
+EXPERIMENT 6 SAMPLE SENTENCES
+============================================================
+
+TRAINING
+------------------------------
+[train         /plain       ] Records show that slorsk weakens quaim.
+      slorsk --DECREASES--> quaim   kind=CAUSAL pol=1 phrase=True stem=True
+[train         /plain       ] Here the quold increases the blurg.
+      quold --INCREASES--> blurg   kind=CAUSAL pol=0 phrase=True stem=True
+[train         /construction] blarrk opens the door to storv.
+      blarrk --ENABLES--> storv   kind=CAUSAL pol=0 phrase=False stem=False
+[train         /plain       ] frurn falls below trart.
+      frurn --FALLS_BELOW--> trart   kind=COMPARATIVE pol=1 phrase=True stem=True
+[train         /plain       ] Here the vard has no effect on the spem.
+      vard --FAILS_TO_PRODUCE--> spem   kind=CAUSAL pol=1 phrase=True stem=True
+[train         /plain       ] Here the tweemp is greater than the prarrb.
+      tweemp --EXCEEDS--> prarrb   kind=COMPARATIVE pol=0 phrase=True stem=True
+[train         /plain       ] In this system the sturt undershoots the thag.
+      sturt --FALLS_BELOW--> thag   kind=COMPARATIVE pol=1 phrase=True stem=True
+[train         /plain       ] The pleerk is fastened to the grent.
+      pleerk --CONNECTS_TO--> grent   kind=STRUCTURAL pol=0 phrase=True stem=True
+[train         /nominal     ] The cause of frat is shrurp.
+      shrurp --CAUSES--> frat   kind=CAUSAL pol=0 phrase=False stem=False
+[train         /plain       ] glov does not affect fraip.
+      glov --FAILS_TO_PRODUCE--> fraip   kind=CAUSAL pol=1 phrase=True stem=True
+[train         /construction] There is nothing between thiz and floot.
+      thiz --MATCHES--> floot   kind=COMPARATIVE pol=0 phrase=False stem=False
+[train         /construction] frirk and blaimp are hooked together.
+      frirk --CONNECTS_TO--> blaimp   kind=STRUCTURAL pol=0 phrase=False stem=False
+
+A_familiar  —  Trained wording and frame, new entities
+------------------------------
+[A_familiar    /plain       ] preez equals than.
+      preez --MATCHES--> than   kind=COMPARATIVE pol=0 phrase=True stem=True
+[A_familiar    /plain       ] Here the vuv adds to the snum.
+      vuv --INCREASES--> snum   kind=CAUSAL pol=0 phrase=True stem=True
+[A_familiar    /plain       ] Records show that troost clears the way for kleat.
+      troost --ENABLES--> kleat   kind=CAUSAL pol=0 phrase=True stem=True
+[A_familiar    /plain       ] The shrurrb decreases the quurb.
+      shrurrb --DECREASES--> quurb   kind=CAUSAL pol=1 phrase=True stem=True
+[A_familiar    /plain       ] By all accounts zuv reveals stoov.
+      zuv --INDICATES--> stoov   kind=EVIDENTIAL pol=0 phrase=True stem=True
+[A_familiar    /plain       ] Here the kraisk hinges on the stirb.
+      kraisk --REQUIRES--> stirb   kind=CAUSAL pol=0 phrase=True stem=True
+
+B_new_frame  —  Held-out plain frame, trained relation word
+------------------------------
+[B_new_frame   /plain       ] Whenever it is present, the skun strengthens the klairk.
+      skun --INCREASES--> klairk   kind=CAUSAL pol=0 phrase=True stem=True
+[B_new_frame   /plain       ] As a rule, krurk lessens plust.
+      krurk --DECREASES--> plust   kind=CAUSAL pol=1 phrase=True stem=True
+[B_new_frame   /plain       ] Whenever it is present, the drait drives up the zurg.
+      drait --INCREASES--> zurg   kind=CAUSAL pol=0 phrase=True stem=True
+[B_new_frame   /plain       ] As a rule, snorsk is smaller than bleev.
+      snorsk --FALLS_BELOW--> bleev   kind=COMPARATIVE pol=1 phrase=True stem=True
+[B_new_frame   /plain       ] Whenever it is present, the krarsk reveals the shrarrk.
+      krarsk --INDICATES--> shrarrk   kind=EVIDENTIAL pol=0 phrase=True stem=True
+[B_new_frame   /plain       ] Whenever it is present, the flearb is responsible for the trap.
+      flearb --CAUSES--> trap   kind=CAUSAL pol=0 phrase=True stem=True
+
+C_inflection  —  Inflected trained word, relation held out of inflected frames
+------------------------------
+[C_inflection  /modal       ] It is known that drant can be short of grorsk.
+      drant --FALLS_BELOW--> grorsk   kind=COMPARATIVE pol=1 phrase=False stem=True
+[C_inflection  /modal       ] glorz will not bear on frean.
+      glorz --FAILS_TO_PRODUCE--> frean   kind=CAUSAL pol=1 phrase=False stem=True
+[C_inflection  /modal       ] The blorld may trail the plaild.
+      blorld --FALLS_BELOW--> plaild   kind=COMPARATIVE pol=1 phrase=False stem=True
+[C_inflection  /progressive ] The slarg is falling below the kluld.
+      slarg --FALLS_BELOW--> kluld   kind=COMPARATIVE pol=1 phrase=False stem=True
+[C_inflection  /modal       ] It is known that slang can be housed in krurz.
+      slang --PART_OF--> krurz   kind=STRUCTURAL pol=0 phrase=False stem=True
+[C_inflection  /modal       ] The freald may be lower than the spesk.
+      freald --FALLS_BELOW--> spesk   kind=COMPARATIVE pol=1 phrase=False stem=True
+
+D_synonym  —  Held-out synonym (arbitrariness control -- expected to fail)
+------------------------------
+[D_synonym     /plain       ] Across every trial the bleet connects to the plurmp.
+      bleet --CONNECTS_TO--> plurmp   kind=STRUCTURAL pol=0 phrase=True stem=False
+[D_synonym     /plain       ] slist points to quung.
+      slist --INDICATES--> quung   kind=EVIDENTIAL pol=0 phrase=True stem=False
+[D_synonym     /plain       ] slom overtakes twurd.
+      slom --EXCEEDS--> twurd   kind=COMPARATIVE pol=0 phrase=True stem=False
+[D_synonym     /plain       ] Each brurng matches some twust.
+      brurng --MATCHES--> twust   kind=COMPARATIVE pol=0 phrase=True stem=False
+[D_synonym     /plain       ] The plarm is conditional on the treak.
+      plarm --REQUIRES--> treak   kind=CAUSAL pol=0 phrase=True stem=False
+[D_synonym     /plain       ] In this system the preld forms part of the pram.
+      preld --PART_OF--> pram   kind=STRUCTURAL pol=0 phrase=True stem=False
+
+E_construction  —  Held-out construction, no relation word present
+------------------------------
+[E_construction/construction] vorb does nothing at all to glorrb.
+      vorb --FAILS_TO_PRODUCE--> glorrb   kind=CAUSAL pol=1 phrase=False stem=False
+[E_construction/construction] twoold turns up once slark is done.
+      twoold --FOLLOWS--> slark   kind=TEMPORAL pol=1 phrase=False stem=False
+[E_construction/construction] thairb on account of krurld.
+      krurld --CAUSES--> thairb   kind=CAUSAL pol=0 phrase=False stem=False
+[E_construction/construction] You will find zib inside kreak.
+      kreak --CONTAINS--> zib   kind=STRUCTURAL pol=0 phrase=False stem=False
+[E_construction/construction] skaist turns up once snald is done.
+      skaist --FOLLOWS--> snald   kind=TEMPORAL pol=1 phrase=False stem=False
+[E_construction/construction] There is no path at all from bruk to krin.
+      bruk --ISOLATED_FROM--> krin   kind=STRUCTURAL pol=1 phrase=False stem=False
+
+F_passive  —  Passive for a relation whose passives were held out
+------------------------------
+[F_passive     /passive     ] It is reported that shruz is indicated by bleng.
+      bleng --INDICATES--> shruz   kind=EVIDENTIAL pol=0 phrase=False stem=False
+[F_passive     /passive     ] zan is exceeded by frop.
+      frop --EXCEEDS--> zan   kind=COMPARATIVE pol=0 phrase=False stem=False
+[F_passive     /passive     ] Every speap is increased by some zarnt.
+      zarnt --INCREASES--> speap   kind=CAUSAL pol=0 phrase=False stem=False
+[F_passive     /passive     ] Every shrorv is prevented by some storng.
+      storng --PREVENTS--> shrorv   kind=CAUSAL pol=1 phrase=False stem=False
+[F_passive     /passive     ] Every klez is exceeded by some breb.
+      breb --EXCEEDS--> klez   kind=COMPARATIVE pol=0 phrase=False stem=False
+[F_passive     /passive     ] In each case the prad is contained by the quaib.
+      quaib --CONTAINS--> prad   kind=STRUCTURAL pol=0 phrase=False stem=False
+
+G_nominal  —  Held-out noun-form phrasing
+------------------------------
+[G_nominal     /nominal     ] The lift on vaist comes from prerk.
+      prerk --INCREASES--> vaist   kind=CAUSAL pol=0 phrase=False stem=False
+[G_nominal     /nominal     ] drurng is a requirement of bluz.
+      bluz --REQUIRES--> drurng   kind=CAUSAL pol=0 phrase=False stem=False
+[G_nominal     /nominal     ] stist is the opening for drub.
+      stist --ENABLES--> drub   kind=CAUSAL pol=0 phrase=False stem=False
+[G_nominal     /nominal     ] The larger body over sleant is vaild.
+      sleant --PART_OF--> vaild   kind=STRUCTURAL pol=0 phrase=False stem=False
+[G_nominal     /nominal     ] The forerunner of froosk is slaimp.
+      slaimp --PRECEDES--> froosk   kind=TEMPORAL pol=0 phrase=False stem=False
+[G_nominal     /nominal     ] The barrier to blairk is flut.
+      flut --PREVENTS--> blairk   kind=CAUSAL pol=1 phrase=False stem=False
+
+COMPOSITION CHAINS (unseen constructions)
+------------------------------
+  1: You will find plimp inside klorng.   [klorng -> plimp]
+  2: You will find vaiv inside plimp.   [plimp -> vaiv]
+     composed: kind=STRUCTURAL polarity=0
+
+  1: More quop means more plint.   [quop -> plint]
+  2: snub on account of plint.   [plint -> snub]
+     composed: kind=CAUSAL polarity=0
+
+  1: More drairb means more blent.   [drairb -> blent]
+  2: No blent occurs unless greeb is present.   [blent -> greeb]
+     composed: kind=CAUSAL polarity=0
+
+  1: thirb first, then thaint.   [thirb -> thaint]
+  2: thaint first, then zarz.   [thaint -> zarz]
+     composed: kind=TEMPORAL polarity=0
+
+  1: You will find zarb inside praild.   [praild -> zarb]
+  2: There is no path at all from zarb to klarp.   [zarb -> klarp]
+     composed: kind=STRUCTURAL polarity=1
+
+  1: There is a line from shrarsk to slorn.   [shrarsk -> slorn]
+  2: slorn is one piece of spov.   [slorn -> spov]
+     composed: kind=STRUCTURAL polarity=0

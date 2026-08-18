@@ -1,0 +1,23 @@
+RELATIONAL TOPOLOGY DEMO
+========================================================================
+Initial graph: 25 undirected relations.
+Initial consistency: True
+
+Infer node 0 -> node 15: 2 (180° / -1)
+Hidden generating relation: 2 (180° / -1)
+Matches: True
+
+TOPOLOGY CHANGE 1: removed relation 3<->11.
+Relation before deletion: 3
+Relation after deletion via remaining paths: disconnected
+Graph remains consistent: True
+
+TOPOLOGY CHANGE 2: added new relation 1->14 = 0 (0° / 1).
+Graph after correct relation: consistent=True
+
+TOPOLOGY CHANGE 3: injected contradictory relation 5->8 = 0; geometry requires 1.
+Graph after contradiction: consistent=False
+Detected reason:
+  Contradiction on edge 8->5: stored relation=0, but current graph implies 3.
+
+No model was retrained during any topology change. The answer changed because the relational structure changed.

@@ -1,0 +1,515 @@
+{
+  "experiment": "Experiment 6 \u2014 Sentence-Level Relation Induction (design 2)",
+  "locked_before_run": true,
+  "hyperparameters": {
+    "seed": 71,
+    "steps": 1200,
+    "batch_size": 64,
+    "learning_rate": 0.002,
+    "n_angles": 12,
+    "train_size": 9000,
+    "test_size_per_tier": 600,
+    "chain_size": 400,
+    "phrase_holdout_fraction": 0.25
+  },
+  "core_question": "Is a relation between two entities in a sentence recoverable from surface structure, and does it then compose by addition across sentences?",
+  "what_changed_from_design_1": "Design 1 trained on one sentence shape and tested on four unseen shapes, so four of five tiers were unlearnable and three fell below the majority floor. Design 2 puts every shape in training and holds out the wording instead.",
+  "kinds": [
+    "CAUSAL",
+    "STRUCTURAL",
+    "TEMPORAL",
+    "COMPARATIVE",
+    "EVIDENTIAL"
+  ],
+  "relation_count": 19,
+  "lexicon": {
+    "relation_types": 19,
+    "total_phrases": 253,
+    "kinds": 5,
+    "phrases_CAUSAL": 121,
+    "phrases_STRUCTURAL": 49,
+    "phrases_TEMPORAL": 29,
+    "phrases_COMPARATIVE": 30,
+    "phrases_EVIDENTIAL": 25
+  },
+  "split_report": {
+    "plain_frames": {
+      "train": 9,
+      "held_out": 3
+    },
+    "inflected_relations": {
+      "train": 13,
+      "held_out": 6,
+      "held_out_names": [
+        "FAILS_TO_PRODUCE",
+        "FALLS_BELOW",
+        "INCREASES",
+        "MATCHES",
+        "PART_OF",
+        "PRECEDES"
+      ]
+    },
+    "passive_relations": {
+      "train": 10,
+      "held_out": 5,
+      "held_out_names": [
+        "CONTAINS",
+        "EXCEEDS",
+        "INCREASES",
+        "INDICATES",
+        "PREVENTS"
+      ]
+    },
+    "phrases": {
+      "CAUSES": {
+        "train": 17,
+        "held_out": 5
+      },
+      "PREVENTS": {
+        "train": 17,
+        "held_out": 5
+      },
+      "ENABLES": {
+        "train": 12,
+        "held_out": 4
+      },
+      "REQUIRES": {
+        "train": 12,
+        "held_out": 3
+      },
+      "INCREASES": {
+        "train": 14,
+        "held_out": 4
+      },
+      "DECREASES": {
+        "train": 14,
+        "held_out": 4
+      },
+      "FAILS_TO_PRODUCE": {
+        "train": 8,
+        "held_out": 2
+      },
+      "CONTAINS": {
+        "train": 10,
+        "held_out": 3
+      },
+      "PART_OF": {
+        "train": 9,
+        "held_out": 3
+      },
+      "CONNECTS_TO": {
+        "train": 11,
+        "held_out": 3
+      },
+      "ISOLATED_FROM": {
+        "train": 8,
+        "held_out": 2
+      },
+      "PRECEDES": {
+        "train": 9,
+        "held_out": 2
+      },
+      "FOLLOWS": {
+        "train": 8,
+        "held_out": 2
+      },
+      "CONCURRENT_WITH": {
+        "train": 6,
+        "held_out": 2
+      },
+      "EXCEEDS": {
+        "train": 9,
+        "held_out": 3
+      },
+      "FALLS_BELOW": {
+        "train": 9,
+        "held_out": 2
+      },
+      "MATCHES": {
+        "train": 6,
+        "held_out": 1
+      },
+      "INDICATES": {
+        "train": 12,
+        "held_out": 3
+      },
+      "CONTRADICTS": {
+        "train": 8,
+        "held_out": 2
+      }
+    },
+    "constructions": {
+      "CAUSES": {
+        "train": 7,
+        "held_out": 1
+      },
+      "PREVENTS": {
+        "train": 5,
+        "held_out": 1
+      },
+      "REQUIRES": {
+        "train": 4,
+        "held_out": 1
+      },
+      "INCREASES": {
+        "train": 4,
+        "held_out": 1
+      },
+      "DECREASES": {
+        "train": 4,
+        "held_out": 1
+      },
+      "CONTAINS": {
+        "train": 4,
+        "held_out": 1
+      },
+      "PRECEDES": {
+        "train": 4,
+        "held_out": 1
+      },
+      "EXCEEDS": {
+        "train": 4,
+        "held_out": 1
+      },
+      "ENABLES": {
+        "train": 4,
+        "held_out": 1
+      },
+      "FAILS_TO_PRODUCE": {
+        "train": 4,
+        "held_out": 1
+      },
+      "PART_OF": {
+        "train": 3,
+        "held_out": 1
+      },
+      "CONNECTS_TO": {
+        "train": 3,
+        "held_out": 1
+      },
+      "ISOLATED_FROM": {
+        "train": 3,
+        "held_out": 1
+      },
+      "FOLLOWS": {
+        "train": 3,
+        "held_out": 1
+      },
+      "CONCURRENT_WITH": {
+        "train": 3,
+        "held_out": 1
+      },
+      "FALLS_BELOW": {
+        "train": 3,
+        "held_out": 1
+      },
+      "MATCHES": {
+        "train": 3,
+        "held_out": 1
+      },
+      "INDICATES": {
+        "train": 3,
+        "held_out": 1
+      },
+      "CONTRADICTS": {
+        "train": 3,
+        "held_out": 1
+      }
+    },
+    "nominals": {
+      "CAUSES": {
+        "train": 2,
+        "held_out": 1
+      },
+      "PREVENTS": {
+        "train": 2,
+        "held_out": 1
+      },
+      "REQUIRES": {
+        "train": 2,
+        "held_out": 1
+      },
+      "CONTAINS": {
+        "train": 2,
+        "held_out": 1
+      },
+      "INCREASES": {
+        "train": 2,
+        "held_out": 1
+      },
+      "DECREASES": {
+        "train": 2,
+        "held_out": 1
+      },
+      "PRECEDES": {
+        "train": 2,
+        "held_out": 1
+      },
+      "EXCEEDS": {
+        "train": 2,
+        "held_out": 1
+      },
+      "INDICATES": {
+        "train": 2,
+        "held_out": 1
+      },
+      "CONNECTS_TO": {
+        "train": 2,
+        "held_out": 1
+      },
+      "ENABLES": {
+        "train": 2,
+        "held_out": 1
+      },
+      "PART_OF": {
+        "train": 2,
+        "held_out": 1
+      },
+      "FOLLOWS": {
+        "train": 2,
+        "held_out": 1
+      },
+      "CONTRADICTS": {
+        "train": 2,
+        "held_out": 1
+      },
+      "FALLS_BELOW": {
+        "train": 2,
+        "held_out": 1
+      }
+    }
+  },
+  "data_audit": {
+    "train_shape_counts": {
+      "construction": 199,
+      "modal": 59,
+      "nominal": 74,
+      "passive": 59,
+      "plain": 383,
+      "progressive": 26
+    },
+    "A_familiar": {
+      "n": 400,
+      "shapes": {
+        "plain": 400
+      },
+      "relations": 19,
+      "class_floor": 0.215,
+      "span_findable": 400
+    },
+    "B_new_frame": {
+      "n": 400,
+      "shapes": {
+        "plain": 400
+      },
+      "relations": 19,
+      "class_floor": 0.2175,
+      "span_findable": 400
+    },
+    "C_inflection": {
+      "n": 400,
+      "shapes": {
+        "modal": 296,
+        "progressive": 104
+      },
+      "relations": 6,
+      "class_floor": 0.1825,
+      "lexicon_phrase_leaks": 0,
+      "leak_examples": [],
+      "span_findable": 400
+    },
+    "D_synonym": {
+      "n": 400,
+      "shapes": {
+        "plain": 400
+      },
+      "relations": 19,
+      "class_floor": 0.2325,
+      "span_findable": 400
+    },
+    "E_construction": {
+      "n": 400,
+      "shapes": {
+        "construction": 400
+      },
+      "relations": 19,
+      "class_floor": 0.2025,
+      "lexicon_phrase_leaks": 0,
+      "leak_examples": [],
+      "span_findable": 400
+    },
+    "F_passive": {
+      "n": 400,
+      "shapes": {
+        "passive": 400
+      },
+      "relations": 5,
+      "class_floor": 0.23,
+      "lexicon_phrase_leaks": 0,
+      "leak_examples": [],
+      "span_findable": 400
+    },
+    "G_nominal": {
+      "n": 400,
+      "shapes": {
+        "nominal": 400
+      },
+      "relations": 15,
+      "class_floor": 0.2975,
+      "lexicon_phrase_leaks": 0,
+      "leak_examples": [],
+      "span_findable": 400
+    }
+  },
+  "tiers": [
+    {
+      "tier": "A_familiar",
+      "description": "Trained wording and frame, new entities",
+      "resolver": 0.9966666666666667,
+      "resolver_kind": 1.0,
+      "resolver_polarity": 0.9966666666666667,
+      "transformer": 0.8383333333333334,
+      "transformer_kind": 0.8883333333333333,
+      "transformer_polarity": 0.9383333333333334,
+      "majority": 0.205,
+      "n": 600
+    },
+    {
+      "tier": "B_new_frame",
+      "description": "Held-out plain frame, trained relation word",
+      "resolver": 0.89,
+      "resolver_kind": 0.925,
+      "resolver_polarity": 0.9633333333333334,
+      "transformer": 0.41333333333333333,
+      "transformer_kind": 0.5783333333333334,
+      "transformer_polarity": 0.66,
+      "majority": 0.21666666666666667,
+      "n": 600
+    },
+    {
+      "tier": "C_inflection",
+      "description": "Inflected trained word, relation held out of inflected frames",
+      "resolver": 0.75,
+      "resolver_kind": 0.855,
+      "resolver_polarity": 0.875,
+      "transformer": 0.5033333333333333,
+      "transformer_kind": 0.6433333333333333,
+      "transformer_polarity": 0.77,
+      "majority": 0.15,
+      "n": 600
+    },
+    {
+      "tier": "D_synonym",
+      "description": "Held-out synonym (arbitrariness control -- expected to fail)",
+      "resolver": 0.325,
+      "resolver_kind": 0.4583333333333333,
+      "resolver_polarity": 0.7166666666666667,
+      "transformer": 0.23833333333333334,
+      "transformer_kind": 0.3566666666666667,
+      "transformer_polarity": 0.6733333333333333,
+      "majority": 0.21166666666666667,
+      "n": 600
+    },
+    {
+      "tier": "E_construction",
+      "description": "Held-out construction, no relation word present",
+      "resolver": 0.2966666666666667,
+      "resolver_kind": 0.41,
+      "resolver_polarity": 0.5966666666666667,
+      "transformer": 0.185,
+      "transformer_kind": 0.365,
+      "transformer_polarity": 0.6083333333333333,
+      "majority": 0.18833333333333332,
+      "n": 600
+    },
+    {
+      "tier": "F_passive",
+      "description": "Passive for a relation whose passives were held out",
+      "resolver": 0.345,
+      "resolver_kind": 0.3516666666666667,
+      "resolver_polarity": 0.9283333333333333,
+      "transformer": 0.235,
+      "transformer_kind": 0.595,
+      "transformer_polarity": 0.5583333333333333,
+      "majority": 0.21833333333333332,
+      "n": 600
+    },
+    {
+      "tier": "G_nominal",
+      "description": "Held-out noun-form phrasing",
+      "resolver": 0.31833333333333336,
+      "resolver_kind": 0.5683333333333334,
+      "resolver_polarity": 0.69,
+      "transformer": 0.205,
+      "transformer_kind": 0.48333333333333334,
+      "transformer_polarity": 0.4716666666666667,
+      "majority": 0.23166666666666666,
+      "n": 600
+    }
+  ],
+  "controls": {
+    "resolver_shuffled_E": 0.235,
+    "transformer_shuffled_E": 0.17666666666666667,
+    "resolver_spanswap_A": 0.25166666666666665,
+    "transformer_spanswap_A": 0.835
+  },
+  "composition": [
+    {
+      "tier": "A_familiar",
+      "resolver_polarity": 0.9975000023841858,
+      "resolver_kind": 1.0,
+      "resolver_both": 0.9975000023841858,
+      "transformer_polarity": 0.7975000143051147,
+      "transformer_kind": 0.8274999856948853,
+      "transformer_both": 0.6625000238418579,
+      "n": 400
+    },
+    {
+      "tier": "E_construction",
+      "resolver_polarity": 0.5950000286102295,
+      "resolver_kind": 0.44749999046325684,
+      "resolver_both": 0.2800000011920929,
+      "transformer_polarity": 0.6449999809265137,
+      "transformer_kind": 0.26499998569488525,
+      "transformer_both": 0.16249999403953552,
+      "n": 400
+    }
+  ],
+  "parameter_counts": {
+    "resolver": 75611,
+    "transformer": 102983
+  },
+  "locked_success_criteria": {
+    "A_familiar_above_85": "tier A >= 0.85 (sanity; nothing below reads without it)",
+    "B_new_frame_above_80": "tier B >= 0.80",
+    "C_inflection_beats_floor_by_30": "tier C minus its floor >= 0.30",
+    "E_construction_beats_floor_by_25": "tier E minus its floor >= 0.25",
+    "E_construction_beats_transformer_by_10": "tier E minus transformer >= 0.10",
+    "F_passive_beats_floor_by_25": "tier F minus its floor >= 0.25",
+    "G_nominal_beats_floor_by_20": "tier G minus its floor >= 0.20",
+    "shuffled_E_drops_by_20": "tier E minus word-shuffled tier E >= 0.20",
+    "span_swap_A_drops_by_30": "tier A minus span-swapped tier A >= 0.30",
+    "chain_E_polarity_beats_50": "composed polarity on unseen constructions >= 0.50 above chance (>= 0.75)"
+  },
+  "criterion_results": {
+    "A_familiar_above_85": true,
+    "B_new_frame_above_80": true,
+    "C_inflection_beats_floor_by_30": true,
+    "E_construction_beats_floor_by_25": false,
+    "E_construction_beats_transformer_by_10": true,
+    "F_passive_beats_floor_by_25": false,
+    "G_nominal_beats_floor_by_20": false,
+    "shuffled_E_drops_by_20": false,
+    "span_swap_A_drops_by_30": true,
+    "chain_E_polarity_beats_50": false
+  },
+  "all_locked_criteria_met": false,
+  "arbitrariness_control": {
+    "tier": "D_synonym",
+    "resolver": 0.325,
+    "majority": 0.21166666666666667,
+    "prediction": "D should sit at its floor. The link between a word's form and its meaning is arbitrary, so nothing in the characters of 'blocks' identifies it as the same relation as 'prevents'. D scoring well above floor would mean something is leaking -- a shared stem, or a frame that gives the relation away -- and the split needs re-auditing before any other tier is believed.",
+    "sits_at_floor": true
+  },
+  "interpretation_rule": "Tier E is the experiment. Passing E above the floor and above the transformer means the relation was read out of sentence structure with no relation word present. Passing the composition check on E means the sentence-level relations then add the way the word-level ones did. Failing E while passing A and B means the model is looking words up, which is a lookup table with extra steps. Mixed results stay mixed."
+}

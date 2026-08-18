@@ -1,0 +1,49 @@
+{
+  "seed": 7,
+  "train_max_len": 5,
+  "test_max_len": 32,
+  "steps": 700,
+  "batch_size": 192,
+  "examples_per_length": 500,
+  "learned_phase_angles_radians_raw": [
+    -1.5927920316016753e-08,
+    1.5707963705062866,
+    3.141592502593994,
+    -1.570796251296997
+  ],
+  "generalization_summary": {
+    "exact": {
+      "mean_in_distribution": 1.0,
+      "mean_out_of_distribution": 1.0,
+      "last_length_accuracy": 1.0
+    },
+    "phase": {
+      "mean_in_distribution": 1.0,
+      "mean_out_of_distribution": 1.0,
+      "last_length_accuracy": 1.0
+    },
+    "transformer": {
+      "mean_in_distribution": 0.9968000054359436,
+      "mean_out_of_distribution": 0.29162962955457195,
+      "last_length_accuracy": 0.2160000056028366
+    }
+  },
+  "contradiction_summary": {
+    "exact": {
+      "mean_in_distribution": 1.0,
+      "mean_out_of_distribution": 1.0,
+      "last_length_accuracy": 1.0
+    },
+    "phase": {
+      "mean_in_distribution": 1.0,
+      "mean_out_of_distribution": 1.0,
+      "last_length_accuracy": 1.0
+    },
+    "transformer": {
+      "mean_in_distribution": 0.9980000058809916,
+      "mean_out_of_distribution": 0.5259999997085996,
+      "last_length_accuracy": 0.4659999907016754
+    }
+  },
+  "interpretation_warning": "This is a synthetic inductive-bias experiment. The exact relational engine is given the correct Z4 composition law, while the transformer must learn the task. A result favoring the relational models does not by itself establish superiority on natural language or prove a new general AI architecture."
+}

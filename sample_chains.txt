@@ -1,0 +1,53 @@
+EXPERIMENT 1b SAMPLE CHAINS
+========================================
+
+ENGLISH
+--------------------
+[english] music --ADJECTIVAL--> musical
+    composed: NOUN -> ADJ, polarity=0, class=2
+[english] create --NOMINALIZE--> creation  creation --PLURAL--> creations
+    composed: VERB -> NOUN, polarity=0, class=2
+[english] nation --PLURAL--> nations
+    composed: NOUN -> NOUN, polarity=0, class=0
+[english] creator --PLURAL--> creators
+    composed: NOUN -> NOUN, polarity=0, class=0
+[english] formal --CAUSATIVE--> formalize
+    composed: ADJ -> VERB, polarity=0, class=2
+[english] create --NOMINALIZE--> creation  creation --PLURAL--> creations
+    composed: VERB -> NOUN, polarity=0, class=2
+[english] produce --AGENTIVE--> producer  producer --PLURAL--> producers
+    composed: VERB -> NOUN, polarity=0, class=2
+[english] privatize --NOMINALIZE--> privatization  privatization --PLURAL--> privatizations
+    composed: VERB -> NOUN, polarity=0, class=2
+
+ENGLISH DEPTH 4
+--------------------
+[english] person --ADJECTIVAL--> personal  personal --CAUSATIVE--> personalize  personalize --NOMINALIZE--> personalization  personalization --PLURAL--> personalizations
+    composed: NOUN -> NOUN, polarity=0, class=0
+[english] nation --ADJECTIVAL--> national  national --CAUSATIVE--> nationalize  nationalize --NOMINALIZE--> nationalization  nationalization --PLURAL--> nationalizations
+    composed: NOUN -> NOUN, polarity=0, class=0
+[english] person --ADJECTIVAL--> personal  personal --CAUSATIVE--> personalize  personalize --NOMINALIZE--> personalization  personalization --PLURAL--> personalizations
+    composed: NOUN -> NOUN, polarity=0, class=0
+[english] person --ADJECTIVAL--> personal  personal --CAUSATIVE--> personalize  personalize --NOMINALIZE--> personalization  personalization --PLURAL--> personalizations
+    composed: NOUN -> NOUN, polarity=0, class=0
+[english] form --ADJECTIVAL--> formal  formal --NEGATION--> informal  informal --CAUSATIVE--> informalize  informalize --NOMINALIZE--> informalization
+    composed: NOUN -> NOUN, polarity=1, class=1
+
+GERMAN
+--------------------
+[german] formal --NEGATION--> informal  informal --CAUSATIVE--> informalisieren
+    composed: ADJ -> VERB, polarity=1, class=3
+[german] nationalisieren --NOMINALIZE--> Nationalisierung  Nationalisierung --PLURAL--> Nationalisierungen
+    composed: VERB -> NOUN, polarity=0, class=2
+[german] spielen --PAST--> spielte
+    composed: VERB -> VERB, polarity=0, class=0
+[german] spezialisieren --NOMINALIZE--> Spezialisierung  Spezialisierung --PLURAL--> Spezialisierungen
+    composed: VERB -> NOUN, polarity=0, class=2
+[german] privatisieren --NOMINALIZE--> Privatisierung
+    composed: VERB -> NOUN, polarity=0, class=2
+[german] Spieler --PLURAL--> Spieler
+    composed: NOUN -> NOUN, polarity=0, class=0
+[german] möglich --NEGATION--> unmöglich
+    composed: ADJ -> ADJ, polarity=1, class=1
+[german] Person --ADJECTIVAL--> persönlich  persönlich --NEGATION--> unpersönlich
+    composed: NOUN -> ADJ, polarity=1, class=3

@@ -1,0 +1,302 @@
+{
+  "experiment": "Learn the relational composition law rather than supplying it",
+  "seed": 29,
+  "train_max_len": 5,
+  "test_max_len": 64,
+  "steps": 950,
+  "batch_size": 160,
+  "examples_per_length": 400,
+  "topology_episodes_per_size": 180,
+  "critical_design_fact": "The two learned-operator models contain NO complex multiplication and NO modular-addition composition rule. Their binary operator is an MLP. Ground-truth Z4 composition is used only to generate target labels and evaluate results.",
+  "structured_priors": [
+    "relation 0 designated as identity",
+    "inverse pairing supplied: 0<->0, 1<->3, 2<->2",
+    "associativity regularizer",
+    "closure regularizer: pair outputs should land near some learned relation state, without specifying which",
+    "prototype separation regularizer"
+  ],
+  "depth_summary": {
+    "exact": {
+      "mean_in_distribution": 1.0,
+      "mean_out_of_distribution": 1.0,
+      "length_32_accuracy": 1.0,
+      "last_length_accuracy": 1.0
+    },
+    "structured": {
+      "mean_in_distribution": 1.0,
+      "mean_out_of_distribution": 0.8933474573038392,
+      "length_32_accuracy": 0.9275000095367432,
+      "last_length_accuracy": 0.7124999761581421
+    },
+    "unconstrained": {
+      "mean_in_distribution": 1.0,
+      "mean_out_of_distribution": 0.9984745777259438,
+      "length_32_accuracy": 1.0,
+      "last_length_accuracy": 0.9900000095367432
+    },
+    "transformer": {
+      "mean_in_distribution": 0.9975000023841858,
+      "mean_out_of_distribution": 0.288940676945751,
+      "length_32_accuracy": 0.20250000059604645,
+      "last_length_accuracy": 0.24500000476837158
+    }
+  },
+  "structured_operator": {
+    "predicted_cayley_table": [
+      [
+        0,
+        1,
+        2,
+        3
+      ],
+      [
+        1,
+        2,
+        3,
+        0
+      ],
+      [
+        2,
+        3,
+        0,
+        1
+      ],
+      [
+        3,
+        0,
+        1,
+        2
+      ]
+    ],
+    "ground_truth_hidden_table": [
+      [
+        0,
+        1,
+        2,
+        3
+      ],
+      [
+        1,
+        2,
+        3,
+        0
+      ],
+      [
+        2,
+        3,
+        0,
+        1
+      ],
+      [
+        3,
+        0,
+        1,
+        2
+      ]
+    ],
+    "table_accuracy": 1.0,
+    "class_associativity_accuracy": 1.0,
+    "structural_residuals": {
+      "identity": 9.566277867634199e-07,
+      "inverse": 7.635582477405478e-08,
+      "associativity": 4.103191258764127e-06,
+      "closure": 4.066227120347321e-06,
+      "separation": 0.0
+    },
+    "prototype_vectors": [
+      [
+        0.17947454750537872,
+        -0.4272518455982208,
+        0.40182363986968994,
+        -0.2796780467033386,
+        0.5933290719985962,
+        0.05573008209466934,
+        -0.20014990866184235,
+        0.3877596855163574
+      ],
+      [
+        -0.03337337076663971,
+        0.4585810899734497,
+        -0.45493078231811523,
+        -0.5929547548294067,
+        0.10036887228488922,
+        -0.307914674282074,
+        0.21336150169372559,
+        -0.2821767032146454
+      ],
+      [
+        0.6086205244064331,
+        -0.22578249871730804,
+        0.3666423559188843,
+        -0.10100407898426056,
+        -0.29788944125175476,
+        -0.1939775049686432,
+        -0.42640313506126404,
+        -0.3546687066555023
+      ],
+      [
+        -0.07265866547822952,
+        0.4488399624824524,
+        -0.3294031023979187,
+        0.31791895627975464,
+        0.6661376953125,
+        0.3638182580471039,
+        -0.050173986703157425,
+        0.07116187363862991
+      ]
+    ]
+  },
+  "unconstrained_operator": {
+    "predicted_cayley_table": [
+      [
+        0,
+        1,
+        2,
+        3
+      ],
+      [
+        1,
+        2,
+        3,
+        0
+      ],
+      [
+        2,
+        3,
+        0,
+        1
+      ],
+      [
+        3,
+        0,
+        1,
+        2
+      ]
+    ],
+    "ground_truth_hidden_table": [
+      [
+        0,
+        1,
+        2,
+        3
+      ],
+      [
+        1,
+        2,
+        3,
+        0
+      ],
+      [
+        2,
+        3,
+        0,
+        1
+      ],
+      [
+        3,
+        0,
+        1,
+        2
+      ]
+    ],
+    "table_accuracy": 1.0,
+    "class_associativity_accuracy": 1.0,
+    "structural_residuals": {
+      "identity": 0.0532195046544075,
+      "inverse": 0.04779462888836861,
+      "associativity": 0.00657243188470602,
+      "closure": 0.21283476054668427,
+      "separation": 0.0
+    },
+    "prototype_vectors": [
+      [
+        0.3713149428367615,
+        -0.2915771007537842,
+        0.13852711021900177,
+        -0.28934404253959656,
+        0.12035194039344788,
+        -0.5776519179344177,
+        0.555020272731781,
+        -0.13410615921020508
+      ],
+      [
+        -0.034624867141246796,
+        0.8264490962028503,
+        0.10277901589870453,
+        -0.05383016914129257,
+        0.2684219479560852,
+        -0.11058957874774933,
+        0.06666678190231323,
+        0.462165504693985
+      ],
+      [
+        0.1545472890138626,
+        0.3208950459957123,
+        -0.4057364761829376,
+        0.22590194642543793,
+        -0.27045130729675293,
+        0.06489798426628113,
+        -0.7577956318855286,
+        -0.07666734606027603
+      ],
+      [
+        -0.27293676137924194,
+        -0.22474786639213562,
+        -0.24101026356220245,
+        -0.6717174649238586,
+        0.0962303951382637,
+        0.24091240763664246,
+        -0.08668284118175507,
+        -0.5393427610397339
+      ]
+    ]
+  },
+  "topology_summary": [
+    {
+      "node_count": 8,
+      "exact_relation": 1.0,
+      "structured_relation": 1.0,
+      "unconstrained_relation": 1.0,
+      "exact_coherence": 1.0,
+      "structured_coherence": 1.0,
+      "unconstrained_coherence": 1.0
+    },
+    {
+      "node_count": 12,
+      "exact_relation": 1.0,
+      "structured_relation": 1.0,
+      "unconstrained_relation": 1.0,
+      "exact_coherence": 1.0,
+      "structured_coherence": 1.0,
+      "unconstrained_coherence": 1.0
+    },
+    {
+      "node_count": 16,
+      "exact_relation": 1.0,
+      "structured_relation": 1.0,
+      "unconstrained_relation": 1.0,
+      "exact_coherence": 1.0,
+      "structured_coherence": 1.0,
+      "unconstrained_coherence": 1.0
+    },
+    {
+      "node_count": 20,
+      "exact_relation": 1.0,
+      "structured_relation": 1.0,
+      "unconstrained_relation": 1.0,
+      "exact_coherence": 1.0,
+      "structured_coherence": 1.0,
+      "unconstrained_coherence": 1.0
+    },
+    {
+      "node_count": 24,
+      "exact_relation": 1.0,
+      "structured_relation": 1.0,
+      "unconstrained_relation": 1.0,
+      "exact_coherence": 1.0,
+      "structured_coherence": 1.0,
+      "unconstrained_coherence": 1.0
+    }
+  ],
+  "interpretation_warning": "This is still a synthetic four-relation world. The structured model is not given the hidden composition table, but it is given strong algebraic priors including identity, inverse pairing, associativity, and closure. A successful result would show that these constraints plus shallow task examples are sufficient to learn a reusable composition operator in this world. It would not establish that arbitrary real-world relational laws can be discovered automatically."
+}

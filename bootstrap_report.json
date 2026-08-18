@@ -1,0 +1,205 @@
+{
+  "experiment": "Experiment 7 \u2014 Lexicon Bootstrapping",
+  "locked_before_run": true,
+  "hyperparameters": {
+    "seed": 91,
+    "n_entities": 60,
+    "edges_per_kind": 900,
+    "hidden_fractions": [
+      0.1,
+      0.3,
+      0.5,
+      0.7,
+      0.9
+    ],
+    "reader_errors": [
+      0.02,
+      0.05
+    ]
+  },
+  "core_question": "Can the composition rule be solved backwards to identify relation words the reader does not know, and does the result feed back in to identify more?",
+  "mechanism": "Every readable sentence is one equation psi(a) XOR psi(b) = polarity over GF(2); every unreadable one adds a variable. Potentials are gauge-free and never resolve, but a phrase's polarity is a difference of potentials and does. Kind is settled by which of the four systems the phrase survives in.",
+  "kinds_used": [
+    "CAUSAL",
+    "COMPARATIVE",
+    "STRUCTURAL",
+    "TEMPORAL"
+  ],
+  "phrases_in_play": 214,
+  "sweep": [
+    {
+      "hidden_fraction": 0.1,
+      "hidden_present": 21,
+      "identified": 16,
+      "identified_fraction": 0.7619047619047619,
+      "correct": 16,
+      "overall": 0.7619047619047619,
+      "accuracy_among_identified": 1.0,
+      "kind_correct": 0.7619047619047619,
+      "polarity_correct": 0.7619047619047619,
+      "rounds_used": 2,
+      "unidentified": 5,
+      "random": 0.047619047619047616,
+      "majority": 0.42857142857142855,
+      "per_round": [
+        16,
+        0
+      ],
+      "corpus_consistent": true,
+      "median_occurrences": 8,
+      "phrases_seen_3_or_fewer": 2
+    },
+    {
+      "hidden_fraction": 0.3,
+      "hidden_present": 64,
+      "identified": 59,
+      "identified_fraction": 0.921875,
+      "correct": 59,
+      "overall": 0.921875,
+      "accuracy_among_identified": 1.0,
+      "kind_correct": 0.921875,
+      "polarity_correct": 0.921875,
+      "rounds_used": 2,
+      "unidentified": 5,
+      "random": 0.125,
+      "majority": 0.359375,
+      "per_round": [
+        59,
+        0
+      ],
+      "corpus_consistent": true,
+      "median_occurrences": 9,
+      "phrases_seen_3_or_fewer": 5
+    },
+    {
+      "hidden_fraction": 0.5,
+      "hidden_present": 106,
+      "identified": 97,
+      "identified_fraction": 0.9150943396226415,
+      "correct": 97,
+      "overall": 0.9150943396226415,
+      "accuracy_among_identified": 1.0,
+      "kind_correct": 0.9150943396226415,
+      "polarity_correct": 0.9150943396226415,
+      "rounds_used": 2,
+      "unidentified": 9,
+      "random": 0.16037735849056603,
+      "majority": 0.2830188679245283,
+      "per_round": [
+        97,
+        0
+      ],
+      "corpus_consistent": true,
+      "median_occurrences": 10,
+      "phrases_seen_3_or_fewer": 5
+    },
+    {
+      "hidden_fraction": 0.7,
+      "hidden_present": 150,
+      "identified": 133,
+      "identified_fraction": 0.8866666666666667,
+      "correct": 133,
+      "overall": 0.8866666666666667,
+      "accuracy_among_identified": 1.0,
+      "kind_correct": 0.8866666666666667,
+      "polarity_correct": 0.8866666666666667,
+      "rounds_used": 2,
+      "unidentified": 17,
+      "random": 0.16,
+      "majority": 0.34,
+      "per_round": [
+        133,
+        0
+      ],
+      "corpus_consistent": true,
+      "median_occurrences": 10,
+      "phrases_seen_3_or_fewer": 9
+    },
+    {
+      "hidden_fraction": 0.9,
+      "hidden_present": 192,
+      "identified": 0,
+      "identified_fraction": 0.0,
+      "correct": 0,
+      "overall": 0.0,
+      "accuracy_among_identified": 0.0,
+      "kind_correct": 0.0,
+      "polarity_correct": 0.0,
+      "rounds_used": 1,
+      "unidentified": 192,
+      "random": 0.13541666666666666,
+      "majority": 0.3125,
+      "per_round": [
+        0
+      ],
+      "corpus_consistent": true,
+      "median_occurrences": 10,
+      "phrases_seen_3_or_fewer": 10
+    }
+  ],
+  "scrambled_control": {
+    "hidden_present": 64,
+    "identified": 6,
+    "identified_fraction": 0.09375,
+    "correct": 0,
+    "overall": 0.0,
+    "accuracy_among_identified": 0.0,
+    "kind_correct": 0.015625,
+    "polarity_correct": 0.046875,
+    "rounds_used": 2,
+    "unidentified": 58,
+    "per_round": [
+      6,
+      0
+    ]
+  },
+  "contradiction": [
+    {
+      "reader_error": 0.02,
+      "overall": 0.265625,
+      "accuracy_among_identified": 0.9444444444444444,
+      "identified_fraction": 0.28125,
+      "injected": 50,
+      "flagged": 624,
+      "detection_ratio": 12.48,
+      "flagged_that_were_corrupt": 32,
+      "attribution_precision": 0.05128205128205128
+    },
+    {
+      "reader_error": 0.05,
+      "overall": 0.109375,
+      "accuracy_among_identified": 0.875,
+      "identified_fraction": 0.125,
+      "injected": 120,
+      "flagged": 743,
+      "detection_ratio": 6.191666666666666,
+      "flagged_that_were_corrupt": 75,
+      "attribution_precision": 0.1009421265141319
+    }
+  ],
+  "locked_success_criteria": {
+    "recovery_at_30_above_80": "at 30% hidden, kind and polarity both right on >= 0.80 of hidden phrases",
+    "precision_at_30_above_95": "at 30% hidden, >= 0.95 correct among the phrases it claims",
+    "recovery_at_50_above_60": "at 50% hidden, >= 0.60 recovered",
+    "beats_random_at_30_by_50": "at 30% hidden, recovery minus random >= 0.50",
+    "beats_majority_at_30_by_40": "at 30% hidden, recovery minus majority class >= 0.40",
+    "scrambled_collapses_below_10": "scrambled corpus at 30% hidden recovers <= 0.10",
+    "bootstrap_needs_second_round": "at 50% hidden, round 2 or later identifies something",
+    "contradictions_detected_above_80": "at 5% reader error, conflicts found >= 0.80 of those injected",
+    "declines_when_starved": "claims a smaller fraction at 90% hidden than at 10% hidden"
+  },
+  "criterion_results": {
+    "recovery_at_30_above_80": true,
+    "precision_at_30_above_95": true,
+    "recovery_at_50_above_60": true,
+    "beats_random_at_30_by_50": true,
+    "beats_majority_at_30_by_40": true,
+    "scrambled_collapses_below_10": true,
+    "bootstrap_needs_second_round": false,
+    "contradictions_detected_above_80": true,
+    "declines_when_starved": true
+  },
+  "all_locked_criteria_met": false,
+  "interpretation_rule": "Recovery well above both baselines, with the scrambled corpus collapsing, means the composition algebra is doing the identification and nothing else is. High accuracy among claimed phrases together with a falling claim rate as the lexicon is starved means the mechanism knows what it does not know. Recovery that survives the scrambled control would mean something other than the algebra is carrying it, and the result would not support the claim. Mixed results stay mixed.",
+  "known_limits": "Only transitive relations can be recovered: a relation that does not compose carries no equation. Phrases appearing in too few sentences, or between entities the rest of the corpus does not reach, are unidentifiable by construction. The corpus here is generated, so it is consistent by design; real text is not."
+}

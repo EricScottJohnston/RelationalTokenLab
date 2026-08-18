@@ -1,0 +1,99 @@
+EXPERIMENT 7 — WHAT THE SOLVER SAW AND WHAT IT CONCLUDED
+================================================================
+
+UNKNOWN PHRASE: 'amplifies'
+   solver concluded : CAUSAL / polarity 0
+   ground truth     : CAUSAL / polarity 0  (correct)
+   sentences it appeared in:
+      As a rule, trov amplifies shreast.   [trov -> shreast]
+      By all accounts pleent amplifies breed.   [pleent -> breed]
+      It is established that prork amplifies grook.   [prork -> grook]
+
+UNKNOWN PHRASE: 'antedates'
+   solver concluded : TEMPORAL / polarity 0
+   ground truth     : TEMPORAL / polarity 0  (correct)
+   sentences it appeared in:
+      Under normal operation the drean antedates the shrook.   [drean -> shrook]
+      The krab antedates the blaing.   [krab -> blaing]
+      As a rule, shruz antedates kroop.   [shruz -> kroop]
+
+UNKNOWN PHRASE: 'carries'
+   solver concluded : STRUCTURAL / polarity 0
+   ground truth     : STRUCTURAL / polarity 0  (correct)
+   sentences it appeared in:
+      In this system the drean carries the shread.   [drean -> shread]
+      By all accounts prork carries shrook.   [prork -> shrook]
+      As a rule, shrairb carries slean.   [shrairb -> slean]
+
+UNKNOWN PHRASE: 'causes'
+   solver concluded : CAUSAL / polarity 0
+   ground truth     : CAUSAL / polarity 0  (correct)
+   sentences it appeared in:
+      The kroop causes the drean.   [kroop -> drean]
+      Each snov causes some krorld.   [snov -> krorld]
+      Across every trial the glurrk causes the prurp.   [glurrk -> prurp]
+
+UNKNOWN PHRASE: 'comes after'
+   solver concluded : TEMPORAL / polarity 1
+   ground truth     : TEMPORAL / polarity 1  (correct)
+   sentences it appeared in:
+      In this system the tworld comes after the zent.   [tworld -> zent]
+      It is established that frov comes after krab.   [frov -> krab]
+      twurst comes after krab.   [twurst -> krab]
+
+UNKNOWN PHRASE: 'comes before'
+   solver concluded : TEMPORAL / polarity 0
+   ground truth     : TEMPORAL / polarity 0  (correct)
+   sentences it appeared in:
+      As a rule, prarnt comes before prork.   [prarnt -> prork]
+      Here the prerk comes before the drean.   [prerk -> drean]
+      In this system the spaisk comes before the slarn.   [spaisk -> slarn]
+
+UNKNOWN PHRASE: 'consists of'
+   solver concluded : STRUCTURAL / polarity 0
+   ground truth     : STRUCTURAL / polarity 0  (correct)
+   sentences it appeared in:
+      By all accounts prork consists of floont.   [prork -> floont]
+      As a rule, floont consists of twain.   [floont -> twain]
+      In this system the prarnt consists of the skurk.   [prarnt -> skurk]
+
+UNKNOWN PHRASE: 'curtails'
+   solver concluded : CAUSAL / polarity 1
+   ground truth     : CAUSAL / polarity 1  (correct)
+   sentences it appeared in:
+      Each krorld curtails some shruz.   [krorld -> shruz]
+      By all accounts prarnt curtails thop.   [prarnt -> thop]
+      It is established that slarn curtails snoong.   [slarn -> snoong]
+
+UNKNOWN PHRASE: 'cuts'
+   solver concluded : CAUSAL / polarity 1
+   ground truth     : CAUSAL / polarity 1  (correct)
+   sentences it appeared in:
+      It is established that bleant cuts klam.   [bleant -> klam]
+      Records show that zormp cuts bleant.   [zormp -> bleant]
+      As a rule, glurrk cuts bleant.   [glurrk -> bleant]
+
+UNKNOWN PHRASE: 'dampens'
+   solver concluded : CAUSAL / polarity 1
+   ground truth     : CAUSAL / polarity 1  (correct)
+   sentences it appeared in:
+      prarnt dampens trug.   [prarnt -> trug]
+      Records show that bleant dampens bling.   [bleant -> bling]
+      Under normal operation the trov dampens the breed.   [trov -> breed]
+
+
+NOT CLAIMED (the corpus did not pin these down)
+----------------------------------------
+   'attenuates'
+   'augments'
+   'blocks'
+   'compounds'
+   'counteracts'
+   'culminates in'
+   'depends on'
+   'forestalls'
+   'is a prerequisite for'
+   'is the cause of'
+   'permits'
+   'tempers'
+   'trails'
