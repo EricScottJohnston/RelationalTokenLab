@@ -1,142 +1,174 @@
-# Relational Reasoner v0.1
+Relational Token Lab
 
-A deliberately **LLM-free** research library for building a persistent recursive relational reasoner with lexical retrieval.
+A deliberately small, CPU-only experiment for testing a complex relational
+composition idea before spending money on GPU compute.
 
-The design goal is:
+What it tests
 
-```text
-question
-  -> lexical retrieval (BM25)
-  -> raw reference text
-  -> trainable relational core
-  -> native structured inference packet
-  -> packet is re-fed as state
-  -> repeat until ANSWER / UNKNOWN / fixed point
-```
+The synthetic relation set is:
 
-## Scientific boundary
+1
 
-This package intentionally does **not** use:
+i
 
-- large language models
-- pretrained language encoders
-- sentence-transformer embeddings
-- vector databases that inject pretrained semantics
-- domain-specific semantic lexicons
-- hand-coded causal rules in the feedback controller
+-1
 
-The package **does** provide a fixed baseline ontology and a trainable neural architecture. A target domain can be held out completely during training; at runtime, subject knowledge can come only from retrieved reference documents.
+-i
 
-This code does **not** claim that arbitrary raw-text zero-shot reasoning is already solved. It gives you the architecture needed to test that claim without contaminating the result with another intelligent model.
+These are the four quarter-turn elements of a simple U(1) / Z4 relation
+system. Relations compose by complex multiplication.
 
-## Baseline ontology
+For example:
 
-Primitive notions include entities, relations, properties, states, change, temporal order, comparisons, causation/enabling/prevention, provenance, and TRUE/FALSE/UNKNOWN.
+A --i--> B
+B --i--> C
 
-The higher system-role layer uses:
+therefore
 
-```text
-Boundary, Policy, Topology, Geometry, Level,
-Rate, Constraint, Delay, Information
-```
+A ---(-1)---> C
 
-The ontology is domain-neutral. It does not contain facts such as `pressure -> geometry` or `jurisdiction -> boundary`.
+because:
 
-## Key design rule
+i * i = -1
 
-**Native model outputs are also valid model inputs.**
+The experiment compares:
 
-The feedback controller only appends the model's packet to the workspace and re-runs the same core. It contains no causal inference rules.
+Exact relational closure — the relation algebra is explicitly known.
 
-## Package layout
+Learned phase composition — the model learns the phase associated with
+each relation symbol, but path composition is structurally constrained.
 
-```text
-relational_reasoner/
-  ontology.py      fixed primitive/system ontology
-  schema.py        propositions, packets, source references
-  workspace.py     persistent state + provenance
-  retrieval.py     pure lexical BM25 and document chunking
-  tokenizer.py     byte/lexeme tokenization; no semantic vocabulary
-  neural.py        trainable byte-level relational core
-  training.py      JSONL training + losses
-  controller.py    deterministic recursive feedback loop
-  rag.py           retrieval + recursion orchestration
-  render.py        deterministic structured output
-  audit.py         contamination/audit manifest
-  checkpoint.py    save/load helpers
-  cli.py           index/train/ask commands
-```
+Tiny transformer baseline — the model has no explicit relation algebra
+and must learn the task from examples.
 
-## Install
+The models are trained only on short paths and then evaluated on paths much
+longer than anything seen during training.
 
-```bash
+A second evaluation treats a relational loop as a contradiction test:
+a loop is consistent only if its net phase returns to the identity.
+
+A third non-neural demo changes a relational graph while it is running by
+adding/removing edges and checks whether implications update without retraining.
+
+Safety / scope
+
+This is not an autonomous agent.
+
+The project contains:
+
+no networking code,
+
+no browser automation,
+
+no shell/subprocess execution,
+
+no model downloads,
+
+no code generation,
+
+no self-modification,
+
+no mechanism for executing actions produced by the models.
+
+It generates synthetic integer relation sequences, trains two tiny local
+models, and writes experiment results to a local results folder.
+
+Visual Studio setup
+
+Install Python 3.11 or newer if needed.
+
+In Visual Studio, make sure the Python development workload is installed.
+
+Open this folder in Visual Studio.
+
+Open a terminal in the project folder.
+
+Create a virtual environment:
+
 python -m venv .venv
-.venv\Scripts\activate        # Windows
-pip install -e .
-```
+.venv\Scripts\activate
 
-For PDF indexing:
+Install dependencies:
 
-```bash
-pip install -e ".[pdf]"
-```
+python -m pip install -r requirements.txt
 
-## Index a reference library
+Run the desktop app:
 
-```bash
-relreason index --corpus ./references --out ./reference_index.json
-```
+python app.py
 
-Supported by default: `.txt`, `.md`. PDF works when the `pdf` extra is installed.
+You can also double-click run_windows.bat after the environment/dependencies
+are configured, provided python resolves to the intended interpreter.
 
-## Train the reasoning core
+First run
 
-Training records are JSONL. See `examples/training_format.jsonl`.
+Use the defaults:
 
-```bash
-relreason train --data examples/training_format.jsonl --out model.pt --steps 1000
-```
+training max path length: 5
 
-For a real experiment, use a much larger generic relational/system training corpus and keep the target subject domain completely absent.
+test max path length: 32
 
-## Ask a question
+training steps: 700
 
-```bash
-relreason ask \
-  --index ./reference_index.json \
-  --checkpoint ./model.pt \
-  "What causes cavitation when inlet pressure falls?"
-```
+batch size: 192
 
-The output is structured. Example shape:
+test examples per length: 500
 
-```text
-STATUS: ANSWER
-TRUTH: TRUE
-SUBJECT: inlet pressure
-RELATION: contributes to
-OBJECT: cavitation
-ROLES: Geometry, State
-SOURCES: pump_reference.pdf#chunk-17
-STEPS: 4
-```
+Click Run full experiment.
 
-The package does not add a prose-generating decoder.
+The app writes:
 
-## Zero-domain RAG protocol
+results/
+    generalization.csv
+    contradictions.csv
+    generalization.png
+    contradictions.png
+    topology_demo.txt
+    report.json
+    models.pt
 
-The intended strong experiment is:
+The two PNG files are the easiest first look.
 
-1. Train the relational core only on generic relational/system tasks.
-2. Freeze **every parameter**.
-3. Build a lexical index for a never-seen subject domain.
-4. Ask questions about that subject.
-5. Allow retrieved reference text to be the only new knowledge source.
-6. Permit recursive re-feeding of the model's own inference packets.
-7. Verify that the optimizer performs zero updates after the freeze point.
+Command-line run
 
-See `experiments/EXPERIMENT_6_PROTOCOL.md`.
+If you prefer no GUI:
 
-## Important limitation
+python experiment.py
 
-A baseline ontology is not the same thing as a semantic lexicon. The model still has to learn how arbitrary text expresses relational structure. If it cannot map unseen prose into its primitives, the experiment should fail rather than silently delegating that step to an LLM.
+Unit tests
+
+python -m unittest test_core.py
+
+How to interpret the result
+
+The important region is to the right of the dashed line in the plots.
+That is path length beyond the training distribution.
+
+A strong result would look like:
+
+exact relational closure remains at or near 100%;
+
+learned phase composition remains high after training only on short paths;
+
+the generic transformer degrades as reasoning depth extends beyond training.
+
+That would demonstrate an inductive-bias advantage on this synthetic task.
+
+It would not establish that the architecture replaces transformer attention
+for natural language. The exact engine is handed the correct composition law,
+which is an intentional structural advantage. The next scientific question
+would be whether useful relations and their composition can be learned from
+natural-language data while preserving the same closure properties.
+
+Why the topology demo matters
+
+The graph demo separates two ideas:
+
+state changes inside a fixed relational graph
+
+from:
+
+the relational graph itself changes
+
+Adding or removing a relation changes what can be inferred without changing
+the inference algorithm. That is the minimal prototype of the
+"changing relational boundary" idea.
