@@ -1,0 +1,420 @@
+"""Experiment 6 — sentence-level relation induction.
+
+Experiment 1b showed that a relation between two *word forms* is recoverable
+from surface alone, composes exactly past training depth, and survives a change
+of language. This asks the same question one level up: is a relation between
+two *entities in a sentence* recoverable the same way.
+
+The design turns on held-out tiers. Training uses one set of relation phrases
+in plain frames. Testing walks progressively further from that:
+
+    T0  training distribution
+    T1  unseen synonym          phrase held out entirely, same frame
+    T2  voice inversion         "B is caused by A" - same relation, swapped args
+    T3  no lexicon phrase       "B follows from A" - relation present, no
+                                trained phrase anywhere in the sentence
+    T4  nominalized             "the cause of B is A" - relation as a noun
+
+T1 passing proves little; a nearest-neighbour lookup would pass T1. T3 is the
+experiment. If the model lands T3 above the floor and above a transformer on
+identical data, the induction front-end is real at sentence level.
+
+Entities are nonce throughout. Real nouns would let the model key on topic
+association - "pressure" and "cavitation" co-occur - rather than on the
+relation. Nonce entities force it onto structure, which is exactly what nonce
+stems did in Experiment 1b.
+"""
+from __future__ import annotations
+
+import random
+from dataclasses import dataclass, field
+from typing import Dict, List, Tuple
+
+from relational_lexicon import (
+    ALL_RELATIONS,
+    KIND_INDEX,
+    KINDS,
+    RELATION_BY_NAME,
+    Relation,
+)
+
+# --------------------------------------------------------------------------
+# Nonce entities. Same construction as the morphology wug set.
+# --------------------------------------------------------------------------
+ONSETS = ["bl", "br", "dr", "fl", "gr", "kl", "pl", "sn", "st", "tr", "v", "z",
+          "sp", "kr", "gl", "th", "sk", "pr", "fr", "sl", "shr", "tw", "qu"]
+NUCLEI = ["a", "e", "i", "o", "u", "or", "ar", "ur", "ee", "oo", "ai", "ea"]
+CODAS = ["b", "d", "g", "k", "m", "n", "p", "rb", "rk", "sk", "t", "v", "z",
+         "nt", "ld", "mp", "ng", "st"]
+
+
+def nonce(rng: random.Random) -> str:
+    return rng.choice(ONSETS) + rng.choice(NUCLEI) + rng.choice(CODAS)
+
+
+# --------------------------------------------------------------------------
+# T0 / T1 frames. The relation phrase is present verbatim.
+# --------------------------------------------------------------------------
+PLAIN_FRAMES = [
+    "{a} {p} {b}.",
+    "The {a} {p} the {b}.",
+    "In this system the {a} {p} the {b}.",
+    "It is established that {a} {p} {b}.",
+    "Under normal operation the {a} {p} the {b}.",
+    "Records show that {a} {p} {b}.",
+    "Each {a} {p} some {b}.",
+    "Whenever it is present, the {a} {p} the {b}.",
+]
+
+# --------------------------------------------------------------------------
+# T2 voice inversion. Arguments swap; the relation does not.
+#
+# "A causes B"  ==  "B is caused by A"
+#
+# The model has to notice that the surface order of the two entities has
+# reversed and that the relation direction has not. A model reading position
+# rather than structure gets exactly these backwards.
+# --------------------------------------------------------------------------
+PARTICIPLES: Dict[str, str] = {
+    "CAUSES": "caused", "PREVENTS": "prevented", "ENABLES": "enabled",
+    "REQUIRES": "required", "INCREASES": "increased", "DECREASES": "decreased",
+    "CONTAINS": "contained", "CONNECTS_TO": "connected to",
+    "PRECEDES": "preceded", "EXCEEDS": "exceeded", "INDICATES": "indicated",
+    "CONTRADICTS": "contradicted", "ISOLATED_FROM": "isolated from",
+    "PART_OF": "included in", "FOLLOWS": "followed",
+}
+
+PASSIVE_FRAMES = [
+    "{b} is {pp} by {a}.",
+    "The {b} is {pp} by the {a}.",
+    "It is reported that {b} is {pp} by {a}.",
+    "Every {b} is {pp} by some {a}.",
+]
+
+# --------------------------------------------------------------------------
+# T3. The relation is expressed with no lexicon phrase anywhere in the
+# sentence. This is the real test.
+#
+# Constructions are relation-specific, so only relations with a clean
+# paraphrase family are covered here.
+# --------------------------------------------------------------------------
+CONSTRUCTIONS: Dict[str, List[str]] = {
+    "CAUSES": [
+        "{b} is downstream of {a}.",
+        "{a} is why {b} happens.",
+        "{b} is a consequence of {a}.",
+        "Where {a} is present, {b} appears.",
+        "{a}, and so {b}.",
+        "{b} on account of {a}.",
+        "Given {a}, {b} ensues.",
+        "{a} is behind {b}.",
+    ],
+    "PREVENTS": [
+        "{b} does not occur where {a} is present.",
+        "{a} keeps {b} from happening.",
+        "With {a} in place, {b} never appears.",
+        "{a} stands in the way of {b}.",
+        "So long as {a} holds, {b} is off the table.",
+        "{b} has no chance while {a} holds.",
+    ],
+    "REQUIRES": [
+        "Without {b} there is no {a}.",
+        "{a} is impossible in the absence of {b}.",
+        "No {a} occurs unless {b} is present.",
+        "{b} is a precondition of {a}.",
+    ],
+    "INCREASES": [
+        "More {a} means more {b}.",
+        "As {a} rises, so does {b}.",
+        "{b} climbs with {a}.",
+        "The greater the {a}, the greater the {b}.",
+    ],
+    "DECREASES": [
+        "More {a} means less {b}.",
+        "As {a} rises, {b} falls.",
+        "{b} drops off as {a} grows.",
+        "The greater the {a}, the smaller the {b}.",
+    ],
+    "CONTAINS": [
+        "Inside every {a} there is a {b}.",
+        "{b} lies in the middle of {a}.",
+        "You will find {b} inside {a}.",
+        "{a} has {b} in it.",
+    ],
+    "PRECEDES": [
+        "{a} first, then {b}.",
+        "{b} only after {a}.",
+        "By the time {b} happens, {a} already has.",
+        "{a} comes first and {b} later.",
+    ],
+    "EXCEEDS": [
+        "{a} is bigger than {b}.",
+        "{b} does not reach {a}.",
+        "{a} sits over {b}.",
+        "Nothing about {b} reaches the level of {a}.",
+    ],
+    # Extra relations so every kind and both polarities appear at T3. Without
+    # these the tier collapses onto a handful of classes and the majority
+    # floor rises high enough to hide the result.
+    "ENABLES": [
+        "With {a} in hand, {b} becomes possible.",
+        "{a} opens the door to {b}.",
+        "{b} is within reach once {a} is there.",
+        "{a} clears the path for {b}.",
+    ],
+    "FAILS_TO_PRODUCE": [
+        "{a} does nothing at all to {b}.",
+        "Whether {a} is there or not, {b} is the same.",
+        "{b} is untouched by {a}.",
+        "{a} leaves {b} exactly as it was.",
+    ],
+    "PART_OF": [
+        "{a} is one piece of {b}.",
+        "You would count {a} among the pieces of {b}.",
+        "{a} makes up some of {b}.",
+    ],
+    "CONNECTS_TO": [
+        "There is a line from {a} to {b}.",
+        "{a} and {b} are hooked together.",
+        "A path runs from {a} through to {b}.",
+    ],
+    "ISOLATED_FROM": [
+        "Nothing runs between {a} and {b}.",
+        "There is no path at all from {a} to {b}.",
+        "{a} and {b} never touch.",
+    ],
+    "FOLLOWS": [
+        "{b} first, then {a}.",
+        "{a} only after {b}.",
+        "{a} turns up once {b} is done.",
+    ],
+    "CONCURRENT_WITH": [
+        "{a} and {b} happen together.",
+        "While {a} is going on, so is {b}.",
+        "{a} and {b} run side by side.",
+    ],
+    "FALLS_BELOW": [
+        "{a} never gets as big as {b}.",
+        "{a} does not come up to {b}.",
+        "{a} sits under {b}.",
+    ],
+    "MATCHES": [
+        "{a} and {b} come to the same thing.",
+        "There is nothing between {a} and {b}.",
+        "{a} is neither more nor less than {b}.",
+    ],
+    "INDICATES": [
+        "From {a} you can read off {b}.",
+        "{a} tells you about {b}.",
+        "{a} is a sign of {b}.",
+    ],
+    "CONTRADICTS": [
+        "{a} cannot be squared with {b}.",
+        "{a} and {b} cannot both hold.",
+        "{a} counts as evidence the other way from {b}.",
+    ],
+}
+
+# --------------------------------------------------------------------------
+# T4. Relation carried by a noun.
+# --------------------------------------------------------------------------
+NOMINALIZATIONS: Dict[str, List[str]] = {
+    "CAUSES": [
+        "The cause of {b} is {a}.",
+        "{a} is the reason for {b}.",
+        "The origin of {b} lies in {a}.",
+    ],
+    "PREVENTS": [
+        "The barrier to {b} is {a}.",
+        "{a} is the obstacle to {b}.",
+        "Protection from {b} comes from {a}.",
+    ],
+    "REQUIRES": [
+        "The prerequisite for {a} is {b}.",
+        "{b} is a requirement of {a}.",
+    ],
+    "CONTAINS": [
+        "The contents of {a} include {b}.",
+        "{b} is among the parts of {a}.",
+    ],
+    "INCREASES": [
+        "The driver of {b} is {a}.",
+        "{a} is the source of growth in {b}.",
+    ],
+    "DECREASES": [
+        "The drag on {b} is {a}.",
+        "{a} is the source of decline in {b}.",
+    ],
+    "PRECEDES": [
+        "The forerunner of {b} is {a}.",
+        "{a} is the earlier of {a} and {b}.",
+    ],
+    "EXCEEDS": [
+        "The larger of {a} and {b} is {a}.",
+        "{a} is the upper of the two.",
+    ],
+    "INDICATES": [
+        "The signal for {b} is {a}.",
+        "{a} is the readout of {b}.",
+    ],
+    "CONNECTS_TO": [
+        "The link to {b} is {a}.",
+        "{a} is the route to {b}.",
+    ],
+}
+
+TIERS = ["T0", "T1", "T2", "T3", "T4"]
+
+
+@dataclass
+class Sample:
+    """One sentence with two marked entity spans and a relation target."""
+    text: str
+    source: str            # the entity the relation runs FROM
+    target: str            # the entity the relation runs TO
+    relation: str          # relation name
+    kind: int
+    polarity: int
+    tier: str
+    frame: str
+    phrase_present: bool   # did a lexicon phrase appear verbatim
+
+    def describe(self) -> str:
+        return (f"[{self.tier}] {self.text}\n"
+                f"      {self.source} --{self.relation}--> {self.target}   "
+                f"kind={KINDS[self.kind]} pol={self.polarity} "
+                f"phrase_in_text={self.phrase_present}")
+
+
+def _make(text: str, src: str, tgt: str, rel: Relation, tier: str,
+          frame: str, phrase_present: bool) -> Sample:
+    return Sample(text=text, source=src, target=tgt, relation=rel.name,
+                  kind=KIND_INDEX[rel.kind], polarity=rel.polarity,
+                  tier=tier, frame=frame, phrase_present=phrase_present)
+
+
+class SentenceGenerator:
+    """Builds each tier. Phrase splits are fixed by seed so train and test
+    never share a relation phrase."""
+
+    def __init__(self, seed: int = 71, holdout_fraction: float = 0.25):
+        rng = random.Random(seed)
+        self.train_phrases: Dict[str, List[str]] = {}
+        self.held_phrases: Dict[str, List[str]] = {}
+        for r in ALL_RELATIONS:
+            ps = list(r.phrases)
+            rng.shuffle(ps)
+            n_held = max(1, int(len(ps) * holdout_fraction))
+            self.held_phrases[r.name] = ps[:n_held]
+            self.train_phrases[r.name] = ps[n_held:]
+
+    # -- individual tiers -------------------------------------------------
+    def _plain(self, rng, rel: Relation, phrases: List[str], tier: str) -> Sample:
+        p = rng.choice(phrases)
+        frame = rng.choice(PLAIN_FRAMES)
+        a, b = nonce(rng), nonce(rng)
+        return _make(frame.format(a=a, p=p, b=b), a, b, rel, tier, frame, True)
+
+    def _passive(self, rng, rel: Relation) -> Sample | None:
+        pp = PARTICIPLES.get(rel.name)
+        if pp is None:
+            return None
+        frame = rng.choice(PASSIVE_FRAMES)
+        a, b = nonce(rng), nonce(rng)
+        # Surface order is b-then-a; the relation still runs a -> b.
+        return _make(frame.format(a=a, b=b, pp=pp), a, b, rel, "T2", frame, False)
+
+    def _construction(self, rng, rel: Relation) -> Sample | None:
+        opts = CONSTRUCTIONS.get(rel.name)
+        if not opts:
+            return None
+        frame = rng.choice(opts)
+        a, b = nonce(rng), nonce(rng)
+        return _make(frame.format(a=a, b=b), a, b, rel, "T3", frame, False)
+
+    def _nominal(self, rng, rel: Relation) -> Sample | None:
+        opts = NOMINALIZATIONS.get(rel.name)
+        if not opts:
+            return None
+        frame = rng.choice(opts)
+        a, b = nonce(rng), nonce(rng)
+        return _make(frame.format(a=a, b=b), a, b, rel, "T4", frame, False)
+
+    # -- datasets ---------------------------------------------------------
+    def dataset(self, seed: int, count: int, tier: str) -> List[Sample]:
+        rng = random.Random(seed)
+        out: List[Sample] = []
+        guard = 0
+        while len(out) < count and guard < count * 80:
+            guard += 1
+            rel = rng.choice(ALL_RELATIONS)
+            if tier == "T0":
+                ps = self.train_phrases[rel.name]
+                if ps:
+                    out.append(self._plain(rng, rel, ps, "T0"))
+            elif tier == "T1":
+                ps = self.held_phrases[rel.name]
+                if ps:
+                    out.append(self._plain(rng, rel, ps, "T1"))
+            elif tier == "T2":
+                s = self._passive(rng, rel)
+                if s:
+                    out.append(s)
+            elif tier == "T3":
+                s = self._construction(rng, rel)
+                if s:
+                    out.append(s)
+            elif tier == "T4":
+                s = self._nominal(rng, rel)
+                if s:
+                    out.append(s)
+        return out
+
+    def split_report(self) -> Dict[str, Dict[str, int]]:
+        return {
+            r.name: {"train": len(self.train_phrases[r.name]),
+                     "held_out": len(self.held_phrases[r.name])}
+            for r in ALL_RELATIONS
+        }
+
+
+# --------------------------------------------------------------------------
+# Controls
+# --------------------------------------------------------------------------
+def shuffle_words(sample: Sample, rng: random.Random) -> Sample:
+    """Destroy syntax, keep vocabulary.
+
+    If accuracy survives this, the model is doing bag-of-words and the
+    structural claim is dead.
+    """
+    words = sample.text.split()
+    rng.shuffle(words)
+    return Sample(**{**sample.__dict__, "text": " ".join(words)})
+
+
+def swap_spans(sample: Sample) -> Sample:
+    """Swap which span is source and which is target.
+
+    The correct answer flips direction. A model that scores the same on this
+    as on the original is not reading direction at all.
+    """
+    d = dict(sample.__dict__)
+    d["source"], d["target"] = sample.target, sample.source
+    return Sample(**d)
+
+
+class CharVocabulary:
+    """Characters only. No word list anywhere."""
+
+    def __init__(self, samples: List[Sample]):
+        chars = set()
+        for s in samples:
+            chars.update(s.text.lower())
+            chars.update(s.source.lower())
+            chars.update(s.target.lower())
+        self.itos = ["<pad>"] + sorted(chars)
+        self.stoi = {c: i for i, c in enumerate(self.itos)}
+
+    def encode(self, text: str, max_chars: int) -> List[int]:
+        ids = [self.stoi.get(ch, 0) for ch in text.lower()[:max_chars]]
+        return ids + [0] * (max_chars - len(ids))

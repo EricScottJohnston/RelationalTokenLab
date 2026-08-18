@@ -1,0 +1,21 @@
+# Virtual environment — recreate with the instructions in README.md
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Model checkpoints. Every experiment regenerates these from its seed; they are
+# large and add nothing a reviewer cannot reproduce.
+*.pt
+
+# Editor / OS
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+
+# Result directories are DELIBERATELY tracked. The JSON reports are the record
+# of what was run and what came out, and the paper cites them directly.
+!*_results/

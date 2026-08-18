@@ -1,0 +1,414 @@
+from __future__ import annotations
+
+import copy
+import math
+import random
+from typing import Dict, List
+
+import numpy as np
+import torch
+from torch import nn
+import torch.nn.functional as F
+
+from system_grammar_data import Case, Vocabulary, ROLES, ROLE_INDEX
+
+
+def cpu_setup():
+    torch.set_num_threads(max(1, min(4, torch.get_num_threads())))
+
+
+def parameter_count(model, trainable_only=False):
+    return sum(
+        p.numel() for p in model.parameters()
+        if (p.requires_grad or not trainable_only)
+    )
+
+
+def encode_case_batch(cases, vocab, max_facts=14, max_words=24, device=torch.device("cpu")):
+    B = len(cases)
+    # facts + one event sentence
+    S = max_facts + 1
+    x = torch.zeros(B, S, max_words, dtype=torch.long, device=device)
+    mask = torch.zeros(B, S, dtype=torch.bool, device=device)
+
+    for b, c in enumerate(cases):
+        seq = c.facts[:max_facts] + [c.event_text]
+        for i, text in enumerate(seq):
+            x[b, i] = torch.tensor(vocab.encode_sentence(text, max_words), device=device)
+            mask[b, i] = True
+
+    targets = {
+        "action": torch.tensor([c.action_kind for c in cases], dtype=torch.long, device=device),
+        "delta": torch.tensor([c.delta for c in cases], dtype=torch.float32, device=device),
+        "affected": torch.tensor([c.affected for c in cases], dtype=torch.float32, device=device),
+        "tg": torch.tensor([c.topology_geometry for c in cases], dtype=torch.long, device=device),
+        "direction": torch.tensor([c.direction for c in cases], dtype=torch.long, device=device),
+    }
+    return x, mask, targets
+
+
+def encode_transformer_batch(cases, vocab, max_tokens=320, device=torch.device("cpu")):
+    x = torch.tensor(
+        [vocab.encode_flat(c, max_tokens) for c in cases],
+        dtype=torch.long,
+        device=device,
+    )
+    targets = {
+        "action": torch.tensor([c.action_kind for c in cases], dtype=torch.long, device=device),
+        "delta": torch.tensor([c.delta for c in cases], dtype=torch.float32, device=device),
+        "affected": torch.tensor([c.affected for c in cases], dtype=torch.float32, device=device),
+        "tg": torch.tensor([c.topology_geometry for c in cases], dtype=torch.long, device=device),
+        "direction": torch.tensor([c.direction for c in cases], dtype=torch.long, device=device),
+    }
+    return x, targets
+
+
+class SentenceEncoder(nn.Module):
+    def __init__(self, vocab_size: int, token_dim=40, event_dim=48):
+        super().__init__()
+        self.embedding = nn.Embedding(vocab_size, token_dim, padding_idx=0)
+        self.net = nn.Sequential(
+            nn.Linear(token_dim, 72),
+            nn.GELU(),
+            nn.Linear(72, event_dim),
+            nn.Tanh(),
+        )
+
+    def forward(self, tokens):
+        emb = self.embedding(tokens)
+        m = (tokens != 0).unsqueeze(-1)
+        pooled = (emb * m).sum(dim=2) / m.sum(dim=2).clamp_min(1)
+        return self.net(pooled)
+
+
+class SystemCore(nn.Module):
+    """
+    Domain-independent recurrent system-state machinery.
+    It is learned in the mechanical domain and frozen for transfer.
+    """
+    def __init__(self, state_dim=64, event_dim=48):
+        super().__init__()
+        self.state_dim = state_dim
+        self.event_dim = event_dim
+        self.cell = nn.GRUCell(event_dim, state_dim)
+
+    def forward(self, events, mask):
+        B, S, E = events.shape
+        h = torch.zeros(B, self.state_dim, device=events.device)
+        for i in range(S):
+            active = mask[:, i]
+            if not active.any():
+                break
+            nxt = self.cell(events[:, i], h)
+            h = torch.where(active.unsqueeze(-1), nxt, h)
+        return h
+
+
+class SystemHeads(nn.Module):
+    def __init__(self, state_dim=64):
+        super().__init__()
+        self.action = nn.Linear(state_dim, 2)
+        self.delta = nn.Linear(state_dim, len(ROLES))
+        self.affected = nn.Linear(state_dim, len(ROLES))
+        self.tg = nn.Linear(state_dim, 4)
+        self.direction = nn.Linear(state_dim, 4)
+
+    def forward(self, h):
+        return {
+            "action": self.action(h),
+            "delta": self.delta(h),
+            "affected": self.affected(h),
+            "tg": self.tg(h),
+            "direction": self.direction(h),
+        }
+
+
+class SystemGrammarModel(nn.Module):
+    def __init__(self, vocab_size, token_dim=40, event_dim=48, state_dim=64):
+        super().__init__()
+        self.encoder = SentenceEncoder(vocab_size, token_dim, event_dim)
+        self.core = SystemCore(state_dim, event_dim)
+        self.heads = SystemHeads(state_dim)
+
+    def forward(self, x, mask):
+        events = self.encoder(x)
+        h = self.core(events, mask)
+        return self.heads(h)
+
+    def transfer_shell(self, new_vocab_size):
+        shell = SystemGrammarModel(
+            new_vocab_size,
+            token_dim=self.encoder.embedding.embedding_dim,
+            event_dim=self.core.event_dim,
+            state_dim=self.core.state_dim,
+        )
+        shell.core.load_state_dict(copy.deepcopy(self.core.state_dict()))
+        shell.heads.load_state_dict(copy.deepcopy(self.heads.state_dict()))
+        for p in shell.core.parameters():
+            p.requires_grad = False
+        for p in shell.heads.parameters():
+            p.requires_grad = False
+        return shell
+
+    def role_scrambled_shell(self, new_vocab_size, seed):
+        shell = self.transfer_shell(new_vocab_size)
+        rng = random.Random(seed)
+        perm = list(range(shell.core.state_dim))
+        rng.shuffle(perm)
+        perm_t = torch.tensor(perm, dtype=torch.long)
+
+        # Break the learned hidden-state coordinate semantics inside the GRU
+        # while retaining the same parameter scale.
+        with torch.no_grad():
+            W_hh = shell.core.cell.weight_hh.clone()
+            # Apply only an inconsistent input-column permutation to recurrent state.
+            shell.core.cell.weight_hh.copy_(W_hh[:, perm_t])
+
+        for p in shell.core.parameters():
+            p.requires_grad = False
+        return shell
+
+    def topology_blind_shell(self, new_vocab_size):
+        shell = self.transfer_shell(new_vocab_size)
+        # Force topology and geometry output channels to become indistinguishable
+        # in the frozen ontology head. Encoder may adapt, but cannot emit different
+        # T/G delta logits through this head.
+        t = ROLE_INDEX["T"]
+        g = ROLE_INDEX["G"]
+        with torch.no_grad():
+            for linear in [shell.heads.delta]:
+                avg_w = (linear.weight[t] + linear.weight[g]) / 2
+                avg_b = (linear.bias[t] + linear.bias[g]) / 2
+                linear.weight[t].copy_(avg_w)
+                linear.weight[g].copy_(avg_w)
+                linear.bias[t].copy_(avg_b)
+                linear.bias[g].copy_(avg_b)
+
+            # Also collapse TG-class head toward ambiguity.
+            w = shell.heads.tg.weight.clone()
+            b = shell.heads.tg.bias.clone()
+            mean_struct_w = (w[1] + w[2]) / 2
+            mean_struct_b = (b[1] + b[2]) / 2
+            shell.heads.tg.weight[1].copy_(mean_struct_w)
+            shell.heads.tg.weight[2].copy_(mean_struct_w)
+            shell.heads.tg.bias[1].copy_(mean_struct_b)
+            shell.heads.tg.bias[2].copy_(mean_struct_b)
+
+        for p in shell.heads.parameters():
+            p.requires_grad = False
+        return shell
+
+
+class PositionalEncoding(nn.Module):
+    def __init__(self, d_model, max_len):
+        super().__init__()
+        pe = torch.zeros(max_len, d_model)
+        pos = torch.arange(max_len).float().unsqueeze(1)
+        div = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))
+        pe[:, 0::2] = torch.sin(pos * div)
+        pe[:, 1::2] = torch.cos(pos * div)
+        self.register_buffer("pe", pe)
+
+    def forward(self, x):
+        return x + self.pe[:x.size(1)].unsqueeze(0)
+
+
+class TinySystemTransformer(nn.Module):
+    def __init__(self, vocab_size, max_tokens=320, d_model=64):
+        super().__init__()
+        self.embedding = nn.Embedding(vocab_size, d_model, padding_idx=0)
+        self.pos = PositionalEncoding(d_model, max_tokens)
+        layer = nn.TransformerEncoderLayer(
+            d_model=d_model,
+            nhead=4,
+            dim_feedforward=128,
+            dropout=0.0,
+            batch_first=True,
+        )
+        self.encoder = nn.TransformerEncoder(layer, num_layers=2)
+        self.cls = nn.Parameter(torch.randn(1, 1, d_model) * 0.02)
+        self.heads = SystemHeads(d_model)
+
+    def forward(self, tokens):
+        B = tokens.size(0)
+        x = self.embedding(tokens)
+        x = self.pos(x)
+        cls = self.cls.expand(B, -1, -1)
+        x = torch.cat([cls, x], dim=1)
+        pad = torch.cat(
+            [torch.zeros(B, 1, dtype=torch.bool, device=tokens.device), tokens == 0],
+            dim=1,
+        )
+        h = self.encoder(x, src_key_padding_mask=pad)[:, 0]
+        return self.heads(h)
+
+
+def multitask_loss(outputs, targets):
+    ce = nn.CrossEntropyLoss()
+    bce = nn.BCEWithLogitsLoss()
+    return (
+        0.8 * ce(outputs["action"], targets["action"])
+        + 1.2 * bce(outputs["delta"], targets["delta"])
+        + 1.0 * bce(outputs["affected"], targets["affected"])
+        + 0.9 * ce(outputs["tg"], targets["tg"])
+        + 0.9 * ce(outputs["direction"], targets["direction"])
+    )
+
+
+def batch_sample(dataset, batch_size, rng):
+    return [dataset[rng.randrange(len(dataset))] for _ in range(batch_size)]
+
+
+def train_system_model(
+    model,
+    dataset,
+    vocab,
+    *,
+    steps,
+    batch_size,
+    lr,
+    seed,
+    progress=None,
+):
+    cpu_setup()
+    device = torch.device("cpu")
+    model.to(device)
+    model.train()
+    trainable = [p for p in model.parameters() if p.requires_grad]
+    opt = torch.optim.AdamW(trainable, lr=lr, weight_decay=1e-4)
+    rng = random.Random(seed)
+
+    for step in range(1, steps + 1):
+        batch = batch_sample(dataset, batch_size, rng)
+        x, mask, y = encode_case_batch(batch, vocab, device=device)
+        opt.zero_grad(set_to_none=True)
+        out = model(x, mask)
+        loss = multitask_loss(out, y)
+        loss.backward()
+        torch.nn.utils.clip_grad_norm_(trainable, 1.0)
+        opt.step()
+        if progress and (step == 1 or step % 25 == 0 or step == steps):
+            delta_pred = (torch.sigmoid(out["delta"]) >= 0.5).float()
+            exact = float((delta_pred == y["delta"]).all(dim=1).float().mean())
+            progress(step, steps, float(loss.detach()), exact)
+    return model
+
+
+def train_transformer(
+    model,
+    dataset,
+    vocab,
+    *,
+    steps,
+    batch_size,
+    lr,
+    seed,
+    progress=None,
+):
+    cpu_setup()
+    device = torch.device("cpu")
+    model.to(device)
+    model.train()
+    opt = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
+    rng = random.Random(seed)
+
+    for step in range(1, steps + 1):
+        batch = batch_sample(dataset, batch_size, rng)
+        x, y = encode_transformer_batch(batch, vocab, device=device)
+        opt.zero_grad(set_to_none=True)
+        out = model(x)
+        loss = multitask_loss(out, y)
+        loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+        opt.step()
+        if progress and (step == 1 or step % 25 == 0 or step == steps):
+            delta_pred = (torch.sigmoid(out["delta"]) >= 0.5).float()
+            exact = float((delta_pred == y["delta"]).all(dim=1).float().mean())
+            progress(step, steps, float(loss.detach()), exact)
+    return model
+
+
+@torch.no_grad()
+def predict_system(model, dataset, vocab, batch_size=128):
+    device = torch.device("cpu")
+    model.eval()
+    outs = {k: [] for k in ["action", "delta", "affected", "tg", "direction"]}
+    ys = {k: [] for k in ["action", "delta", "affected", "tg", "direction"]}
+
+    for start in range(0, len(dataset), batch_size):
+        batch = dataset[start:start+batch_size]
+        x, mask, y = encode_case_batch(batch, vocab, device=device)
+        out = model(x, mask)
+        outs["action"].append(out["action"].argmax(1).cpu())
+        outs["delta"].append((torch.sigmoid(out["delta"]) >= 0.5).int().cpu())
+        outs["affected"].append((torch.sigmoid(out["affected"]) >= 0.5).int().cpu())
+        outs["tg"].append(out["tg"].argmax(1).cpu())
+        outs["direction"].append(out["direction"].argmax(1).cpu())
+        for k in ys:
+            ys[k].append(y[k].int().cpu())
+
+    return (
+        {k: torch.cat(v, dim=0).numpy() for k, v in outs.items()},
+        {k: torch.cat(v, dim=0).numpy() for k, v in ys.items()},
+    )
+
+
+@torch.no_grad()
+def predict_transformer(model, dataset, vocab, batch_size=128):
+    device = torch.device("cpu")
+    model.eval()
+    outs = {k: [] for k in ["action", "delta", "affected", "tg", "direction"]}
+    ys = {k: [] for k in ["action", "delta", "affected", "tg", "direction"]}
+
+    for start in range(0, len(dataset), batch_size):
+        batch = dataset[start:start+batch_size]
+        x, y = encode_transformer_batch(batch, vocab, device=device)
+        out = model(x)
+        outs["action"].append(out["action"].argmax(1).cpu())
+        outs["delta"].append((torch.sigmoid(out["delta"]) >= 0.5).int().cpu())
+        outs["affected"].append((torch.sigmoid(out["affected"]) >= 0.5).int().cpu())
+        outs["tg"].append(out["tg"].argmax(1).cpu())
+        outs["direction"].append(out["direction"].argmax(1).cpu())
+        for k in ys:
+            ys[k].append(y[k].int().cpu())
+
+    return (
+        {k: torch.cat(v, dim=0).numpy() for k, v in outs.items()},
+        {k: torch.cat(v, dim=0).numpy() for k, v in ys.items()},
+    )
+
+
+def binary_micro_f1(pred, truth):
+    pred = pred.astype(bool)
+    truth = truth.astype(bool)
+    tp = np.logical_and(pred, truth).sum()
+    fp = np.logical_and(pred, ~truth).sum()
+    fn = np.logical_and(~pred, truth).sum()
+    if tp == 0:
+        return 0.0
+    return float(2 * tp / (2 * tp + fp + fn))
+
+
+def invariant_precision_from_affected(pred_affected, true_affected):
+    pred_invariant = ~pred_affected.astype(bool)
+    true_invariant = ~true_affected.astype(bool)
+    tp = np.logical_and(pred_invariant, true_invariant).sum()
+    fp = np.logical_and(pred_invariant, ~true_invariant).sum()
+    if tp + fp == 0:
+        return 0.0
+    return float(tp / (tp + fp))
+
+
+def evaluate_metrics(pred, truth):
+    delta_exact = float((pred["delta"] == truth["delta"]).all(axis=1).mean())
+    compound_exact = delta_exact
+    return {
+        "action_kind_accuracy": float((pred["action"] == truth["action"]).mean()),
+        "system_role_exact_accuracy": delta_exact,
+        "system_role_micro_f1": binary_micro_f1(pred["delta"], truth["delta"]),
+        "topology_vs_geometry_accuracy": float((pred["tg"] == truth["tg"]).mean()),
+        "affected_set_micro_f1": binary_micro_f1(pred["affected"], truth["affected"]),
+        "invariant_set_precision": invariant_precision_from_affected(pred["affected"], truth["affected"]),
+        "counterfactual_direction_accuracy": float((pred["direction"] == truth["direction"]).mean()),
+        "complete_delta_signature_accuracy": compound_exact,
+    }

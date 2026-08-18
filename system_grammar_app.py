@@ -1,0 +1,329 @@
+from __future__ import annotations
+
+import json
+import queue
+import threading
+import tkinter as tk
+from tkinter import ttk, messagebox
+
+from system_grammar_experiment import run_experiment
+
+
+class App(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("Relational Token Lab — Experiment 5: System Grammar and Causal Transfer")
+        self.geometry("1210x850")
+        self.minsize(1000, 720)
+        self.events = queue.Queue()
+        self.worker = None
+        self._build()
+        self.after(100, self._poll)
+
+    def _build(self):
+        outer = ttk.Frame(self, padding=12)
+        outer.pack(fill="both", expand=True)
+
+        ttk.Label(
+            outer,
+            text="Experiment 5 — System Grammar and Causal Transfer",
+            font=("Segoe UI", 18, "bold"),
+        ).pack(anchor="w")
+
+        ttk.Label(
+            outer,
+            text="Physical control system → frozen system grammar → administrative/legal system.",
+        ).pack(anchor="w", pady=(0, 10))
+
+        cfg = ttk.LabelFrame(outer, text="Locked run", padding=10)
+        cfg.pack(fill="x")
+
+        self.seed = tk.StringVar(value="53")
+        self.mech_steps = tk.StringVar(value="1100")
+        self.admin_steps = tk.StringVar(value="350")
+        self.batch = tk.StringVar(value="72")
+
+        for i, (lab, var) in enumerate([
+            ("Seed", self.seed),
+            ("Mechanical steps", self.mech_steps),
+            ("Admin steps/model/budget", self.admin_steps),
+            ("Batch", self.batch),
+        ]):
+            ttk.Label(cfg, text=lab).grid(row=0, column=i, padx=5, sticky="w")
+            ttk.Entry(cfg, textvariable=var, width=20).grid(row=1, column=i, padx=5, sticky="we")
+            cfg.columnconfigure(i, weight=1)
+
+        ttk.Label(cfg, text="Administrative label budgets: 8, 16, 32, 64, 128").grid(
+            row=2, column=0, columnspan=4, sticky="w", padx=5, pady=(6,0)
+        )
+
+        self.cleanup = tk.BooleanVar(value=False)
+        self.num_states = tk.StringVar(value="512")
+        ttk.Checkbutton(
+            cfg,
+            text="Discrete state cleanup (snap to a learned finite state set after every step)",
+            variable=self.cleanup,
+        ).grid(row=3, column=0, columnspan=3, sticky="w", padx=5, pady=(6, 0))
+        sf = ttk.Frame(cfg)
+        sf.grid(row=3, column=3, sticky="e", padx=5, pady=(6, 0))
+        ttk.Label(sf, text="States:").pack(side="left")
+        ttk.Entry(sf, textvariable=self.num_states, width=8).pack(side="left", padx=(4, 0))
+        ttk.Label(
+            cfg,
+            text="Off = original continuous-state run. On = closure property from Experiments 1-3. "
+                 "State count is the size of the discrete alphabet.",
+            foreground="#555555",
+        ).grid(row=4, column=0, columnspan=4, sticky="w", padx=5)
+
+        row = ttk.Frame(outer)
+        row.pack(fill="x", pady=10)
+        self.run = ttk.Button(row, text="Run Experiment 5", command=self._start)
+        self.run.pack(side="left")
+        self.progress = ttk.Progressbar(row, maximum=100, mode="determinate")
+        self.progress.pack(side="right", fill="x", expand=True, padx=(20, 0))
+
+        nb = ttk.Notebook(outer)
+        nb.pack(fill="both", expand=True)
+
+        log_tab = ttk.Frame(nb, padding=8)
+        lock_tab = ttk.Frame(nb, padding=8)
+        result_tab = ttk.Frame(nb, padding=8)
+        nb.add(log_tab, text="Run log")
+        nb.add(lock_tab, text="Locked design")
+        nb.add(result_tab, text="Result summary")
+
+        self.log = tk.Text(log_tab, wrap="word", font=("Consolas", 10))
+        self.log.pack(fill="both", expand=True)
+
+        lock = tk.Text(lock_tab, wrap="word", font=("Segoe UI", 10))
+        lock.pack(fill="both", expand=True)
+        lock.insert("1.0", """LOCKED HYPOTHESIS
+
+A model can learn a domain-independent grammar of systems in a physical control
+domain, then reuse that grammar to reason causally in a semantically different
+administrative/legal domain.
+
+SYSTEM ROLES
+
+    B  Boundary
+    P  Policy
+    T  Topology
+    G  Geometry
+    L  Level
+    R  Rate
+    C  Constraint
+    D  Delay
+    I  Information
+
+Behavior is the resulting trajectory, not a primitive.
+
+CAUSAL TASK
+
+Given a deliberate intervention:
+
+1. identify which system roles changed directly;
+2. distinguish topology from geometry;
+3. identify the downstream affected role set;
+4. identify what remains invariant;
+5. predict the qualitative direction of the nominated terminal level.
+
+Observation is not intervention. An observed change must not automatically be
+treated as a causal manipulation.
+
+DOMAIN A
+
+Physical fluid-control systems:
+tanks, pipes, pumps, valves, controllers, sensors, safety limits and delays.
+
+DOMAIN B
+
+Administrative/legal institutional systems:
+jurisdiction, authority/referral relations, review-channel capacity, queues,
+processing rates, statutory constraints, waiting periods and information.
+
+TRANSFER
+
+Only the learned system core and the system-output heads transfer.
+Both are frozen.
+The administrative domain receives a fresh vocabulary and sentence encoder.
+
+CONTROLS
+
+    Transfer
+    Scratch system model
+    Role-scrambled transfer
+    Topology-blind transfer
+    Tiny transformer
+
+FEW-SHOT ADMINISTRATIVE TRAINING
+
+    8, 16, 32, 64, 128 labeled examples
+
+Administrative training contains only SINGLE interventions.
+
+HARD COMPOUND TEST
+
+    2-3 simultaneous interventions
+    never seen during administrative training
+
+LOCKED CRITERIA
+
+At 32 legal/admin examples:
+    Transfer - Scratch      >= 15 percentage points
+    Transfer - Transformer  >= 10 percentage points
+
+Hard administrative test:
+    Exact role/delta identification      >= 90%
+    Topology-vs-geometry accuracy        >= 95%
+    Downstream affected-set F1           >= 90%
+    Invariant-set precision              >= 95%
+    Counterfactual direction             >= 90%
+
+Unseen compound interventions:
+    Complete causal-delta signature      >= 85%
+
+Role-scrambled control:
+    Must be >= 10 points worse than intact transfer on exact role signature.
+
+IMPORTANT
+
+A policy change is NOT automatically a topology change.
+
+Examples:
+
+    rule changes existing channel capacity
+        -> Policy + Geometry
+        -> topology unchanged
+
+    rule removes an authority/connection
+        -> Policy + Topology
+        -> geometry need not change
+
+This is the distinction the experiment is explicitly designed to test.
+
+Do not reduce a mixed result to a single boolean. Each locked claim is separately
+reported in the JSON.
+""")
+        lock.configure(state="disabled")
+
+        self.summary = tk.Text(result_tab, wrap="word", font=("Consolas", 10))
+        self.summary.pack(fill="both", expand=True)
+
+        self._append("Ready. CPU-only. This is heavier than Experiment 4.\n")
+
+    def _start(self):
+        if self.worker and self.worker.is_alive():
+            return
+        try:
+            seed = int(self.seed.get())
+            ms = int(self.mech_steps.get())
+            ads = int(self.admin_steps.get())
+            batch = int(self.batch.get())
+            if ms < 100 or ads < 50 or batch < 16:
+                raise ValueError("Use at least 100 mechanical steps, 50 admin steps, batch >= 16.")
+        except Exception as e:
+            messagebox.showerror("Invalid settings", str(e))
+            return
+
+        self.run.configure(state="disabled")
+        self.progress["value"] = 0
+        self.log.delete("1.0", "end")
+        self.summary.delete("1.0", "end")
+        self._append("Starting Experiment 5...\n\n")
+
+        cleanup = bool(self.cleanup.get())
+        try:
+            nstates = int(self.num_states.get())
+            if nstates < 2:
+                raise ValueError("Use at least 2 discrete states.")
+        except Exception as e:
+            messagebox.showerror("Invalid settings", str(e))
+            self.run.configure(state="normal")
+            return
+        self.worker = threading.Thread(
+            target=self._worker, args=(seed, ms, ads, batch, cleanup, nstates), daemon=True
+        )
+        self.worker.start()
+
+    def _worker(self, seed, ms, ads, batch, cleanup, nstates):
+        try:
+            def cb(kind, payload):
+                self.events.put((kind, payload))
+            arm = f"cleanup_on_{nstates}" if cleanup else "cleanup_off"
+            result = run_experiment(
+                output_dir=f"system_grammar_results_v2/gui_{arm}",
+                seed=seed,
+                mechanical_steps=ms,
+                admin_steps=ads,
+                batch_size=batch,
+                event_callback=cb,
+                cleanup=cleanup,
+                num_states=nstates,
+            )
+            self.events.put(("complete", result))
+        except Exception as e:
+            self.events.put(("error", repr(e)))
+
+    def _poll(self):
+        try:
+            while True:
+                kind, p = self.events.get_nowait()
+                if isinstance(p, dict) and "overall" in p:
+                    self.progress["value"] = 100 * p["overall"]
+
+                if kind == "mechanical_train":
+                    self._append(
+                        f"Mechanical {p['step']:4d}/{p['total']} | "
+                        f"loss={p['loss']:.5f} | exact delta={p['exact']:.3f}\n"
+                    )
+                elif kind == "admin_train":
+                    self._append(
+                        f"Admin n={p['budget']:3d} | {p['model']:14s} | "
+                        f"{p['step']:3d}/{p['total']} | loss={p['loss']:.5f} | "
+                        f"exact delta={p['exact']:.3f}\n"
+                    )
+                elif kind == "budget_done":
+                    r = p["row"]
+                    self._append(
+                        "\n"
+                        f"Budget {p['budget']}: "
+                        f"transfer={r['transfer_role_exact']:.3f}, "
+                        f"scratch={r['scratch_role_exact']:.3f}, "
+                        f"scrambled={r['scrambled_role_exact']:.3f}, "
+                        f"topo-blind={r['topology_blind_role_exact']:.3f}, "
+                        f"transformer={r['transformer_role_exact']:.3f}\n\n"
+                    )
+                elif kind in ("status", "done_status"):
+                    self._append("\n" + p["text"] + "\n")
+                elif kind == "complete":
+                    self.progress["value"] = 100
+                    self.run.configure(state="normal")
+                    report = p["report"]
+                    self._append("\nExperiment complete.\nResults folder:\n" + p["output_dir"] + "\n")
+                    compact = {
+                        "state_cleanup": report["state_cleanup"],
+                        "num_relation_states": report["num_relation_states"],
+                        "mechanical_pretraining_metrics": report["mechanical_pretraining_metrics"],
+                        "sample_efficiency": report["sample_efficiency"],
+                        "hard_administrative_metrics_at_max_budget": report["hard_administrative_metrics_at_max_budget"],
+                        "compound_intervention_metrics_at_max_budget": report["compound_intervention_metrics_at_max_budget"],
+                        "criterion_results": report["criterion_results"],
+                        "all_locked_criteria_met": report["all_locked_criteria_met"],
+                        "interpretation_rule": report["interpretation_rule"],
+                    }
+                    self.summary.insert("1.0", json.dumps(compact, indent=2))
+                elif kind == "error":
+                    self.run.configure(state="normal")
+                    self._append("\nERROR:\n" + p + "\n")
+                    messagebox.showerror("Experiment failed", p)
+        except queue.Empty:
+            pass
+        self.after(100, self._poll)
+
+    def _append(self, txt):
+        self.log.insert("end", txt)
+        self.log.see("end")
+
+
+if __name__ == "__main__":
+    App().mainloop()
